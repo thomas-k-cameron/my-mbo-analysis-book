@@ -12,6 +12,7 @@ Link: [dataset](https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-
 
 
 There is a notebook on kaggle which does something simliar to what I did on this chapter.
+
 Link: [notebook](https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-osaka-20210301)
 
 
@@ -61,33 +62,15 @@ Each color represents different variables;
 
   Orange is based on the longest time between each events.
 
-  For example, if the order was inserted on 10:00, modified on 10:01, 10:05, then deleted on 10:07, then this value would be 4 minutes (or 2.4e+11 nano seconds).
-
-  
+  For example, if the order was inserted on 10:00, modified on 10:01, 10:05, then deleted on 10:07, then this value would be 4 minutes (or 2.4e+11 nano seconds), because between 10:01 and 10:05 is longest wait time.
   
 - Red  
+  Red is based on the shortest time between each events.
 
-  Red is baed on the variable `time_passed_since_last_event_min`.
+  For example, if the order was inserted on 10:00, modified on 10:01, 10:05, then deleted on 10:07, then this value would be 1 minutes (or 6e+10 nano seconds), because between 10:00 and 10:01 is the shortest.
 
-  `Orange` and `Red` can be observed only when the order is modified;
-  Thus, 
-
-
-So, why should we look at these variables?  
-Here is my reason for picking these variables:
-
-- Red: `min_reaction_time`  
-  This should help us difference between high speed orders and the rest.  
-  
-- Orange: `time_passed_since_last_event_max`  
-  HFT won't always traded at the fastest possible speed.   
-  If an order that exhibits slower trading speed makes some difference, then that should be interesting.  
-
-- Blue: `existed_for`  
-  This should help us how the length of stay affect the execution rate.  
-  This variable is the easiest to measure; If this varialbe happens to be useful at predicting the execution rate, I believe that it would be a nice variable that would help building a prediction machine. 
-
-- Green: `existed_for` but for orders modified at least once.
+Orange and Red can only be observed when the order is modified.
+I added Green to see if it is the modification that is making the difference or not.
 
 ## Result1: Nikkei 225 and Nikkei 225 Mini Futures
 Let's take a look at orders from NK225/NK225M.

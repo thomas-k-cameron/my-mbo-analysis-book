@@ -22,24 +22,13 @@ Each order is assigned with different rank based on the measured speed.
 
 
 ## Measuring the speed
-Measurement is almost the same as the methodology I presented to you in question1.
-- minimum reaction time
-  
-- maximum reaction time
+Measurement is the same as the methodology I presented to you in question 1.
+For the image above, it is the same as the `Green`.
 
-- other rank  
-Speed of order who is is inserted at that time point, cannot be measured and they are assigned to `other`.
-
-# Measuring the speed
+It is based on how long the order had existed on the order book, and it only includes the orders that was modified at least once.
 
 
-- First image shows the 
-
-
-
-The plot on the buttom shows the bid/ask price, and the one on above 
-
-# Update Frequency 
+## Update Frequency 
 Update frequency is same as the market depth.
 This data is updated every time there is an update to the order book.
 Order book is considered *updated*, when an order is added to the order book or if one of the order on the order book is removed, modified or matched.

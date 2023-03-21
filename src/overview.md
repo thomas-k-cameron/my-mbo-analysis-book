@@ -2,8 +2,11 @@
 This is my personal research project about Limit Order Book Reconstruction with snapshot of ITCH messages, and building a prediction machine based on that. 
 
 - Research Question  
-  - Is it true that high-speed orders are more likely to get canceled?
-  - Can you build a prediction machine?
+  1. Is it true that high-speed orders are more likely to get canceled?
+  2. Can you build a prediction machine?
+
+  2nd research question didn't work out well.   
+  I detailed out what I tried, and why I decided to move on without any proper result.
 
 - Dataset  
   Dataset is the snapshot of ITCH protocol message distributed on March 2021 at Osaka Exchange.
@@ -28,12 +31,3 @@ This is my personal research project about Limit Order Book Reconstruction with 
   As part of my senior thesis, I made some of the dataset I'm using for this project partially available online.
 
   https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-osaka-20210301
-
-# Research Questions
-
-- Is it true that high-speed orders are more likely to get canceled?
-
-- How cloud computing help you process the files?
-
-- If the order speed is going to matter, can you use that information to improve the prediction model?
-

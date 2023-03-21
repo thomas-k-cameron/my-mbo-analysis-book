@@ -1,8 +1,11 @@
 # Research Question 2: Prediction Machine
 ## Overview
-The goal is to figureout whether it is possible to improve the model and it is NOT my intention to build a model that can be used in live-trading environment.
+I initially tried to use first 12 days of data as a training set, and rest the of data as a validation set.
 
-First, I will generate necessary data to be fed into my machine learning model.
-Aside from order-speed related data, I generate market price related data so that I can compare them.
+The goal of this research was to    
+- bulid a model that is capable of predicting the market move, and
+- if the order's speed can improve the model
 
 
+It didn't work, mostly for technical issues.  
+I describe the reason on `What went wrong` section.

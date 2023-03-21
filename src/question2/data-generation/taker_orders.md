@@ -21,7 +21,7 @@ I'm using the last executed price of the future contract as a reference price. F
 
 - Weighting Small Trades
 
-Variables suffixed with `no_vol` *un-weights* executions based on volume.
+I'm going to divide each trades 
 
 Consider a case where 2 trades are executed at 10,000 JPY, where volume is 5 and 1 each.
 
