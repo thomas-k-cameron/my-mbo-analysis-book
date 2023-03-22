@@ -9,7 +9,7 @@ This image is a visualization of *depth imbalance*.
 Above chart is generated using \\((Q=5000\\)) and \\((Q=100\\)) of market depth data.  
 The orange chart is the difference between the ask price, and blue is the difference between the bid price.
 
-I have 5 variations for market depth, each with \\(Q = \{ 1, 100, 500, 1000, 2000, 5000 \} \\)
+I have 5 variations for market depth, each with \\(Q = \{ 100, 500, 1000, 2000, 5000 \} \\)
 So, I decided to calculate with every combination.
 
 
@@ -39,5 +39,3 @@ Every \\( Q_1 \\) and \\( Q_2 \\) is \\( Q_1 < Q_2 \\).
 
 # Source Code
 Source code for generating this data can be found here.
-
-`src/bin/depth_imbalance.rs`
