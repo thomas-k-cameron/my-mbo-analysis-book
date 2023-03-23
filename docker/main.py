@@ -123,6 +123,7 @@ def load_data(format, data_path):
 
     return lazy_frame.select([pl.col("timestamp"), pl.col([pl.Float64, pl.Int64]).cast(pl.Float32)]).select(["timestamp", pl.col(pl.Float32)]).sort("timestamp")
 
+
 def feature_engineering(lazy_frame: pl.LazyFrame):
     lazy_frame.select([
         pl.col(pl.Float32).rolling_mean("60s", by="timestamp"),
@@ -130,11 +131,12 @@ def feature_engineering(lazy_frame: pl.LazyFrame):
         pl.col(pl.Float32).rolling_mean("60m", by="timestamp"),
     ])
 
+
 def load_label(data_df: pl.DataFrame, label_path):
     df_label = pl.scan_csv(label_path).select(["signal", pl.col(
         "base_timestamp").alias("timestamp").str.strptime(pl.Datetime("ns"))]).sort("timestamp")
-    dflabel = df_label.join_asof(data_df.select("timestamp").lazy(), on="timestamp", strategy="forward").sort(
-        "timestamp").collect()
+    dflabel = df_label.lazy().join(data_df.lazy().select("timestamp"), on="timestamp").sort(
+        "timestamp").fill_null(strategy="forward").collect()
     return dflabel
 
 
@@ -157,6 +159,11 @@ def train_model(side: str, df_X: pl.DataFrame, df_Y: pl.DataFrame, model=None):
         model.fit(df_X_slice.to_pandas(), df_Y_slice.to_pandas())
         print("", flush=True)
         prev = i
+    df_X_slice = df_X[prev:df_X.height]
+    df_Y_slice = df_Y[prev:df_X.height]
+    if df_Y_slice.height > 0:
+        model.fit(df_X_slice.to_pandas(), df_Y_slice.to_pandas())
+
     return model
 
 
@@ -209,16 +216,15 @@ def process_files(buymodel, sellmodel):
     df = stack[0]
     for df2 in stack[1:]:
         df = df.join(df2, on="timestamp")
-    
+
     df_X = df.select([pl.col("timestamp"), pl.col(pl.Float32)]).collect()
     df_Y = load_label(df_X, "/tmp/input/label.csv")
     if df_X.height != df_Y.height:
-        df_X = df_X.join_asof(df_Y, on="timestamp")
-    df_Y = df_Y.select("signal")
-    print(df_X)
+        df_X = df_X.lazy().join(df_Y.lazy().select("timestamp"), on="timestamp", how="outer")
+        df_X = df_X.sort("timestamp").fill_null(strategy="forward")
+    df_X = df_X.lazy().select(pl.col("*").exclude("timestamp")).sort("timestamp").collect()
     print("all data loaded onto the memory: ",
-          df_X.estimated_size(), flush=True)
-    print("label loaded onto the memory: ", df_X.estimated_size(), flush=True)
+          df_X.shape, df_X.estimated_size(), flush=True)
     buymodel = train_model("buy", df_X, df_Y, buymodel)
     sellmodel = train_model("sell", df_X, df_Y, sellmodel)
     return buymodel, sellmodel

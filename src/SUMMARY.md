@@ -4,7 +4,7 @@
 
 - [Research Question 1: Speed and Execution Rate](./question1/result.md)
 
-- [Research Question 2: My failed attempt to build a prediction model](./question2/overview.md)
+- [Research Question 2: Building a prediction model](./question2/overview.md)
 
     - [Data Generation](./question2/data-generation/overview.md)
 
