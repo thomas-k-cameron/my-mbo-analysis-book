@@ -16,19 +16,27 @@ import keras.callbacks
 import polars as pl
 import os
 import json
-tf.config.threading.set_intra_op_parallelism_threads(8)
+
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 tf.random.set_seed(42)
 os.mkdir("/tmp/input")
 os.mkdir("/tmp/input/data")
+os.mkdir("/tmp/input/label")
 os.mkdir("/tmp/output")
+SIDE = os.environ["SIDE"]
 TARGET_PRODUCT = os.environ["TARGET_PRODUCT"]
-DATA_FORMAT = os.environ["DATA_FORMAT"]
+DATA_FORMAT = os.environ["DATA_FORMAT"].split(";")
 BUCKET = "compute-assets-36607b9c2d934caa8bf7d19e0251bab6"
 S3_CLIENT = boto3.client("s3")
 LABEL_SIZE = os.environ["LABEL_SIZE"]
+if "EPOCS" in os.environ:
+    EPOCHS = int(os.environ["EPOCS"])
+else:
+    EPOCHS = 1
 
+tf.config.threading.set_intra_op_parallelism_threads(8)
+tf.config.threading.set_inter_op_parallelism_threads(8)
 
 def create_ae_mlp(num_columns, num_labels, hidden_units, dropout_rates, ls=1e-2, lr=1e-3):
 
@@ -75,6 +83,7 @@ def create_ae_mlp(num_columns, num_labels, hidden_units, dropout_rates, ls=1e-2,
                            'action': tf.keras.metrics.AUC(name='AUC'),
                            },
                   )
+    model.fit
     """
     model.fit(
         X[tr], [X[tr], y[tr], y[tr]], validation_data = (X[te], [X[te], y[te], y[te]]), 
@@ -87,26 +96,23 @@ def create_ae_mlp(num_columns, num_labels, hidden_units, dropout_rates, ls=1e-2,
 # %%
 
 
-def prepare_model(side, df):
-    import pathlib
-    path = pathlib.Path(f"/tmp/model/{side}.model")
+def prepare_model(width: int):
     params = {
-        'num_columns': df.width,
+        'num_columns': width,
         'num_labels': 1,
         'hidden_units': [96, 96, 896, 448, 448, 256],
         'dropout_rates': [0.03527936123679956, 0.038424974585075086, 0.42409238408801436, 0.10431484318345882, 0.49230389137187497, 0.32024444956111164, 0.2716856145683449, 0.4379233941604448],
         'ls': 0,
         'lr': 1e-3,
     }
-    if path.is_file():
-        return tf.keras.models.load_model(path)
-    else:
-        model = create_ae_mlp(**params)
-        return model
+
+    model = create_ae_mlp(**params)
+    return model
 
 
 def load_data(format, data_path):
     filename = pathlib.Path(data_path).name
+    format = filename_to_format(filename)
     if format == "taker_positions":
         suffix = filename.split("_")[4]
         cols = list(map(lambda x: pl.col(x), json.load(
@@ -116,13 +122,13 @@ def load_data(format, data_path):
             pl.Datetime("ns"))).drop(["include_time_range_name"]).select(cols).select([pl.col("timestamp"), pl.col("*").exclude("timestamp").map_alias(lambda x: x+"_"+suffix)])
     elif format == "order_depth":
         suffix = filename.split("_")[3]
-        print('suffix: ', suffix)
         lazy_frame = pl.scan_parquet(data_path).with_columns(pl.col("timestamp").str.strptime(
             pl.Datetime("ns"))).drop(["order_book_id"]).select([pl.col("timestamp"), pl.col("*").exclude("timestamp").map_alias(lambda x: x+"_"+suffix)])
     elif format == "depth_imbalance":
         lazy_frame = pl.scan_parquet(data_path).drop("order_book_id")
     else:
-        raise ""
+        print("format: ", format)
+        raise format
 
     return lazy_frame.select([pl.col("timestamp"), pl.col([pl.Float64, pl.Int64]).cast(pl.Float32)]).select(["timestamp", pl.col(pl.Float32)]).sort("timestamp")
 
@@ -141,45 +147,19 @@ def load_label(label_path):
     return df_label
 
 
-def train_model(side: str, df_X: pl.DataFrame, df_Y: pl.DataFrame, es = None, model=None):
-    df_X=df_X.select(pl.col(pl.Float32))
-    es = EarlyStopping(monitor = 'val_action_AUC', min_delta = 1e-4, patience = 10, mode = 'max', baseline = None, restore_best_weights = True, verbose = 0)
-    if side.lower() == "buy":
-        df_Y = df_Y.select(pl.col("signal") == "Buy")
-    elif side.lower() == "sell":
-        df_Y = df_Y.select(pl.col("signal") == "Sell")
-    else:
-        raise ""
+def file_to_disk(key: str, body, date_idx, is_data=False):
+    path = pathlib.Path(key)
+    filename = path.name.replace(".csv.zst", ".csv")
+    try:
+        os.mkdir(f"/tmp/input/data/{date_idx}/")
+    except:
+        pass
 
-    print(df_X)
-    print(df_Y)
-
-    if model == None:
-        model = prepare_model(side, df_X)
-    prev = 0
-    for i in range(0, df_X.height, 5000*8):
-        if prev == i:
-            continue
-        df_X_slice = df_X[prev:i]
-        df_Y_slice = df_Y[prev:i]
-        model.fit(df_X_slice.to_pandas(), df_Y_slice.to_pandas(), epochs = 100)
-        print("", flush=True)
-        prev = i
-    df_X_slice = df_X[prev:df_X.height]
-    df_Y_slice = df_Y[prev:df_X.height]
-    if df_Y_slice.height > 0:
-        model.fit(df_X_slice.to_pandas(), df_Y_slice.to_pandas())
-
-    return model
-
-
-def file_to_disk(key: str, is_data, body, date_idx = None):
-    ext = pathlib.Path(key).suffix.replace(".csv.zst", ".cswv")
-    if is_data == "data":
-        filepath = f"/tmp/input/data/{date_idx}{ext}"
+    if is_data:
+        filepath = f"/tmp/input/data/{date_idx}/{filename}"
     else:
         filepath = f"/tmp/input/label/{date_idx}.csv"
-    fp = open(filepath.replace(".csv.zst", ".csv"), "wb")
+    fp = open(filepath, "wb")
     if key.endswith("zst"):
         s = zstd.decompress(body.read())
     else:
@@ -189,71 +169,132 @@ def file_to_disk(key: str, is_data, body, date_idx = None):
     fp.close()
 
 
-def download_files(idx: str):
-    print(os.listdir("/tmp/input/data"), flush=True)
-    for i in os.listdir("/tmp/input/data"):
-        os.remove(f"/tmp/input/data/{i}")
-    try:
-        os.remove("/tmp/input/label.csv")
-    except:
-        pass
+def download_files():
     print("starting download", flush=True)
     df = pl.read_parquet("./files.parquet")
-    df = df.filter(pl.col("data_format") == DATA_FORMAT)
+    df = df.filter(pl.col("data_format").is_in(DATA_FORMAT))
     df = df.filter(pl.col("product") == TARGET_PRODUCT.upper())
-    df = df.filter(pl.col("dateidx") == idx)
     for i in df.to_dicts():
         print("downloading: ", i["key"], flush=True)
         obj = S3_CLIENT.get_object(Bucket=BUCKET, Key=i["key"])
-        file_to_disk(i["key"], "data", obj["Body"])
+        file_to_disk(i["key"], obj["Body"], i["dateidx"], is_data=True)
 
     label_df = pl.read_parquet("./labels.parquet")
     for i in label_df.filter(pl.col("product") == TARGET_PRODUCT.lower()).filter(pl.col("label_size") == LABEL_SIZE).to_dicts():
         print("downloading: ", i["key"], flush=True)
         obj = S3_CLIENT.get_object(Bucket=BUCKET, Key=i["key"])
-        file_to_disk(i["key"], "label", obj["Body"])
+        file_to_disk(i["key"], obj["Body"], i["dateidx"])
+
+def filename_to_format(name: str):
+    if "order_depth" in name:
+        return "order_depth"
+    elif "depth_imbalance" in name:
+        return "depth_imbalance"
+    elif "taker"  in name:
+        return "taker_positions"
+    else:
+        raise BaseException(name)
 
 
-def process_files(buymodel, sellmodel):
-    stack: list[pl.LazyFrame] = []
-    for i in pathlib.Path("/tmp/input/data/").iterdir():
-        lf = load_data(DATA_FORMAT, i)
-        stack.append(lf)
-    df = stack[0]
-    for df2 in stack[1:]:
-        df = df.join(df2, on="timestamp")
+def dataiter(range_start: int, range_end: int):
+    for idx in range(range_start, range_end):
+        stack: list[pl.LazyFrame] = []
+        for i in pathlib.Path(f"/tmp/input/data/{idx}").iterdir():
+            lf = load_data(DATA_FORMAT, i)
+            stack.append(lf)
+            df = stack[0]
+            for df2 in stack[1:]:
+                df = df.join(df2, on="timestamp")
 
-    df_X = df.select([pl.col("timestamp"), pl.col(pl.Float32)]).collect()
+            df_X = df.select(
+                [pl.col("timestamp"), pl.col(pl.Float32)]).collect()
+
+            df_Y = load_label(f"/tmp/input/label/{idx}.csv")
+            df_Y = df_Y.join(df_X.lazy().select("timestamp"), on="timestamp", how="outer").sort(
+                "timestamp").fill_null(strategy="forward").fill_null("Timeout").select(["signal", "timestamp"]).collect()
+            df_X = df_X.lazy().join(df_Y.lazy().select("timestamp"), on="timestamp",
+                                    how="outer").sort("timestamp").fill_null(strategy="forward").fill_null(0.).collect()
+
+            prev = 0
+            for i in range(0, df_X.height, 5000*8):
+                if prev == i:
+                    continue
+                df_X_slice = df_X[prev:i]
+                df_Y_slice = df_Y[prev:i]
+                tup = df_X_slice.select(pl.col(pl.Float32)), df_Y_slice.select(pl.col("*").exclude("timestamp"))
+                yield tup
+                prev = i
+
+            df_X_slice = df_X[prev:df_X.height]
+            df_Y_slice = df_Y[prev:df_X.height]
+            tup = df_X_slice.select(pl.col(pl.Float32)), df_Y_slice.select(pl.col("*").exclude("timestamp"))
+            yield tup
     
-    df_Y = load_label("/tmp/input/label.csv")
-    print(df_Y.columns)
-    df_Y = df_Y.join(df_X.lazy().select("timestamp"), on="timestamp", how="outer").sort("timestamp").fill_null(strategy="forward").fill_null("Timeout").select(["signal", "timestamp"]).collect()
-    df_X = df_X.lazy().join(df_Y.lazy().select("timestamp"), on="timestamp", how="outer").sort("timestamp").fill_null(strategy="forward").fill_null(0.).collect()
-    
-    print("X: all data loaded onto the memory: ",
-          df_X.shape, df_X.estimated_size(), flush=True)
-    print("Y: all data loaded onto the memory: ",
-          df_Y.shape, df_Y.estimated_size(), flush=True)
-    buymodel = train_model("buy", df_X, df_Y, buymodel)
-    sellmodel = train_model("sell", df_X, df_Y, sellmodel)
-    return buymodel, sellmodel
 
+def df_ready_up(range_start: int, range_end: int):
+    df_tup = (None, None)
+    for tup in dataiter(range_start, range_end):
+        if isinstance(df_tup[0], pl.DataFrame) and isinstance(df_tup[1], pl.DataFrame):
+            df_tup = (df_tup[0].vstack(tup[0].select(df_tup[0].columns), in_place=True), df_tup[1].vstack(tup[1].select(df_tup[1].columns), in_place=True))
+        else:
+            df_tup = tup
+    assert isinstance(df_tup[0], pl.DataFrame) and isinstance(df_tup[1], pl.DataFrame)
+    return df_tup
+
+outcome = {}
 def main():
-    buymodel, sellmodel = None, None
-    for i in range(0, 13):
-        download_files(str(i))
-        buymodel, sellmodel = process_files(buymodel, sellmodel)
-    buymodel.save("/tmp/output/buy")
-    sellmodel.save("/tmp/output/sell")
-    suffix = f"{DATA_FORMAT}_{TARGET_PRODUCT}/{LABEL_SIZE}"
+    download_files()
+    def train_evaluate(side):
+        model = None
+        for tup in dataiter(0, 13):
+            df_X, _df_Y = tup
+            model = prepare_model(df_X.width)
+            break
 
-    def upload_model(directory):
-        os.system(
-            f"aws s3 cp /tmp/output/{directory} s3://{BUCKET}/model/{directory}/{suffix} --recursive")
-    print(os.walk(f"/tmp/output/buy"))
-    upload_model("buy")
-    upload_model("sell")
-
+        assert model != None
+        train = df_ready_up(0, 13)
+        df_X = train[0]
+        df_Y = train[1].select(pl.col("signal") == side)
+        print(df_X, df_Y)
+        es = EarlyStopping(monitor='val_action_AUC', min_delta=1e-4, patience=10,
+                        mode='max', baseline=None, restore_best_weights=True, verbose=0)
+        print("X: all data loaded onto the memory: ",
+                df_X.shape, df_X.estimated_size(), flush=True)
+        print("Y: all data loaded onto the memory: ",
+                df_Y.shape, df_Y.estimated_size(), flush=True)
+        history = model.fit(df_X.to_pandas(), df_Y.to_pandas(), validation_split=0.2, epochs=EPOCHS)  # type: ignore
+        print(history.history)
+        test = df_ready_up(13, 23)
+        df_testX = test[0]
+        df_testY = test[1].select(pl.col("signal") == side)
+        X, Y = df_testX.to_pandas(), df_testY.to_pandas()
+        predictions = model.predict(X)
+        print(predictions)
+        result = model.evaluate(X, Y)
+        
+        print(history)
+        side = side.lower()
+        DATA_FORMAT_concat = "--".join(DATA_FORMAT)
+        modelname = f"{DATA_FORMAT_concat}_{side}_{TARGET_PRODUCT}_{LABEL_SIZE}"
+        model.save(f"/tmp/output/{modelname}")
+        save_outcome(modelname, history.history,predictions)
+    
+    train_evaluate(SIDE)
+    
+def save_outcome(modename, history, predictions):
+    key = f"s3://{BUCKET}/model/{modename}"
+    json.dump(history, open("history.json", "w"))
+    
+    json.dump(predictions, open("predictions.json", "w"))
+    hashmap = {}
+    for key in os.environ.keys():
+        hashmap[key] = os.environ[key]
+    json.dump(hashmap, open("env.json", "w"))
+    S3_CLIENT.upload_fileobj(open("history.json", "r"), f"{key}/history.json")
+    S3_CLIENT.upload_fileobj(open("env.json", "r"), f"{key}/env.json")
+    S3_CLIENT.upload_fileobj(open("predictions.json", "r"), f"{key}/predictions.json")
 
 print("starting")
 main()
+
+
