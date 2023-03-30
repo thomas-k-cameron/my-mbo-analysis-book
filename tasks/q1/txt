@@ -1,0 +1,29 @@
+{
+    "image": "879655802347.dkr.ecr.us-east-2.amazonaws.com/tasks-q1:latest",
+    "command": [
+        "echo",
+        "hello world"
+    ],
+    "jobRoleArn": "arn:aws:iam::879655802347:role/IAM-fargate-role",
+    "executionRoleArn": "arn:aws:iam::879655802347:role/IAM-fargate-role",
+    "volumes": [],
+    "environment": [],
+    "mountPoints": [],
+    "ulimits": [],
+    "resourceRequirements": [
+        {
+            "value": "8",
+            "type": "VCPU"
+        },
+        {
+            "value": "63488",
+            "type": "MEMORY"
+        }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {},
+        "secretOptions": []
+    },
+    "secrets": []
+}
