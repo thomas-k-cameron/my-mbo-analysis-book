@@ -1,33 +1,45 @@
-# Overview 
-This is my personal research project about Limit Order Book Reconstruction with snapshot of ITCH messages, and building a prediction machine based on that. 
+# Overview/Summary
+This is my personal research project about analyzing the market order-by-order using snapshot of ITCH message from Osaka Exchange.
 
-- Research Question  
-  1. Is it true that high-speed orders are more likely to get canceled?
-  2. Can you build a prediction machine?
+## Research Question  
+  1. Is it true that high-speed orders are more likely to get canceled?  
+      Yes, this is true.   
+      *Slower* orders is more likely to be executed, though there are some context to it.
 
-  2nd research question didn't work out well.   
-  I detailed out what I tried, and why I decided to move on without any proper result.
+  2. It is said that taker orders are driving force in the market, how can you visualize them?    
+    I plotted out a unrealized gain and expected profit at maturity with different window.   
+    It seems like it tends to correlate with market trends to some extent.
 
-- Dataset  
-  Dataset is the snapshot of ITCH protocol message distributed on March 2021 at Osaka Exchange.
+  3. Do BBO spread reflect market quality for larger order?   
+    BBO spread is commonly used to measure market quality.  
+    BBO spread assumes that 
+    Average execution price of contracts for size Q fluctuates over time.  
+    
+    
+  4. Can you predict the market movement with the data generated above?  
+    I couldn't make it work.  
+    I think I should've instead, focused on modeling it as a evolving probability distribution.  
+
+## Kaggle Dataset  
+  As part of my senior thesis, I made some of the dataset I'm using for this project partially available online.
+
+  - [Dataset](https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-osaka-20210301)
+  - [Notebook](https://www.kaggle.com/code/a53e93e57a1/analyzing-high-frequency-trader-by-order)
+
+
+## Dataset  
+  Dataset is the snapshot of ITCH protocol message distributed on March 2021 at Osaka Exchange.   
   ITCH is a message format widely adopted by financial exchanges and it is tailored for distributing information to market participants.  
   Size of the data exceeds 200GB.  
 
-  For my particular dataset, it contains the information necessary to re-build the order book for every products available;
+  For my particular dataset, it contains the information necessary to rebuild the order book for every products available;
   This includes, Options, Futures and Combination products.  
 
-- Technical Infrastructure  
-  Data was stored on `S3` and processing happened on `EC2` managed by `Batch`.
+## Technical Infrastructure  
+  Data was stored on `AWS S3` and processed with spot instances of `AWS EC2` managed by `AWS Batch`.
 
-- LOB Simluation Software   
-  Software for LOB reconstruction is developed from scratch, solely by me. It is written in Rust, based on the specification provided by JPX.   
+## LOB Simluation Software   
+  
+  Software for LOB reconstruction is developed from scratch based on the specification provided by JPX, solely by me.   
+  It is written in Rust.   
   Callback based interface allows you to capture updates that happens on the order book.
-
-- Machine Learning, Data Analysis
-  I used python when I wanted to take advantage of the eco-system.
-  For tasks that python isn't fast enough, I used Rust.
-
-- Kaggle Dataset  
-  As part of my senior thesis, I made some of the dataset I'm using for this project partially available online.
-
-  https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-osaka-20210301

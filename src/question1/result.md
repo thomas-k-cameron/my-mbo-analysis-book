@@ -19,9 +19,11 @@ Link: [notebook](https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset
 # Methodology
 Take a look at a scatter plot below.
 
-!["result1"](../images/execution_rate_result1.png)
+!["result1"](../image/../images/execution_rate/all_options.jpg)
 
-Each scatter plot points represents a probability of an order within a specific range to have the variable `fully_executed` to be true.
+Each scatter plot points represents a probability of an order within a specific range to be fully matched before it is removed or .
+
+Plots that says `fully_executed` on the title: This is the name of the variable that tells whether the order was matched with the taker. You can find the dataset on kaggle.
 
 To visualize how the likeliness of an order changes under different cirumstances, I have plotted out different variables/subset in different color.
 
@@ -78,9 +80,9 @@ Nikkei futures are the most actively traded rroducts on Osaka Exchange.
 
 Execution rate is noticably higher and while you can see higher execution rate on the slower end of the distribution, execution rate is somewhat higher on faster end.
 
-Additionally, excution rate of the orange (`time_passed_since_last_event_max`) is more dynamic; Since we can't see the same on the red, I think we can attribute this to variable, and not `modify_count`.
+Additionally, excution rate of the orange is more *dynamic*; Since we can't see the same trend on the `green`, I think we can say that this is not to do with the number of times that order was modified.
 
-!["result2"](../images/execution_rate_result2.png)
+!["result2"](../images/execution_rate/plot_nk225_nk225m.jpg)
 
 ## Result2: Future Only
 
@@ -88,16 +90,18 @@ Result is similar to that of the NK225/NK225M.
 
 Around 17% of orders are from NK225/NK225M; I think it is possible that it was not able to capture the features that other instrument has got.
 
-!["result3"](../images/execution_rate_result3.png)
+!["result3"](../images/execution_rate/all_future.jpg)
 
 ## Result 3: Options Only
+This is the plot that I have shown to you.
+
 While execution rate of options are lower compare to futures in most group, somehow the fastest pint of Red shows the highest execution rate.
 
 Slower/faster orders shows a higher execution rate just like other orders, but execution rate of slower orders are lower compared to futures.
 
 Additionally, we see a slight increase in execution rate for orange around 10^9 ~ 10^10 nano seconds.
 
-!["result4"](../images/execution_rate_result4.png)
+!["result4"](../images/execution_rate/all_options.jpg)
 
 ## Result 5: Comparing instrument at nearest expiry; JGBL/NK225 Mini/NK225/TOPIX/TOPIX Mini
 
@@ -109,7 +113,11 @@ Ornage for TOPIX Mini is scattered across the plot though we can't see that on R
 
 Execution rate for JGBL is higher for all colors; Interestingly the execution rate is the higest around 10^11.
 
-!["result5"](../images/execution_rate_result5.png)
+!["result5"](../images/execution_rate/most_active_products_JGBL.jpg)
+!["result5"](../images/execution_rate/most_active_products_NK225.jpg)
+!["result5"](../images/execution_rate/most_active_products_NK225M.jpg)
+!["result5"](../images/execution_rate/most_active_products_TOPIX.jpg)
+!["result5"](../images/execution_rate/most_active_products_TOPIXM.jpg)
 
 ## Discussion
 We have seen that how difference in speed, products result in different execution rate.  
@@ -122,11 +130,11 @@ I think this can be the reason that the orange is showing high execution rate in
 
 ### differecent execution rate among different instruments
 We observed different execution rate among different instrument.
-Trend of execution rate for TOPIX mini was noticably different from others. 
+Trend of execution rate for Nikkei225 mini was noticably different from others. 
 
 I believe that  part of the reason that they exhibit different trend is because of the difference in the people who are trading them.
 
-It is known that TOPIX Mini is popular among retail traders while JGBL is very difficult to trade if you are retail, since popular retail brokers like Rakuten or SBI doesn't offer them.
+It is known that Nikkei225 mini is popular among retail traders while JGBL is very difficult to trade if you are retail, since popular retail brokers like Rakuten or SBI doesn't offer them.
 
 It should be interesting because this would help us identify the order flow; It could be coming from retail, institutionals, or someone else.
 
@@ -139,10 +147,8 @@ Here are few things that I believe that I can do to get a better insight;
 
 - Processing
   
-    We used an aggregate of order events (update, creation, deletion). While this approach simplfies the analysis, you are missing a lot of pieces of information.  
-
-    I would formulate the data into 
-    
+    We used an aggregate of order events (update, creation, deletion).   
+    This approach simplfies the data; While this make things simpler, you are missing out lots of the information that could've been used.
 
 -  Order flow prediction
   
@@ -150,7 +156,7 @@ Here are few things that I believe that I can do to get a better insight;
 
     For example, we know that Game Stop was very very popular among retails especially around the great short squeeze. But we cannot say the same for things like SOFR futures or Euro dollars futures; As far as I'm concerned, no one on wallstreet bets is talking about rate products.
 
-    We can use these products as a sample, fi 
+    I think I can compare maker orders on GME vs SOFR to see how things are different.
 
     We've already seen different product exhibits different trend in execution rate, so I think this is a good way to move forward.
   

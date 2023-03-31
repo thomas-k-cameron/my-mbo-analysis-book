@@ -35,8 +35,14 @@ if "EPOCS" in os.environ:
 else:
     EPOCHS = 1
 
-tf.config.threading.set_intra_op_parallelism_threads(8)
-tf.config.threading.set_inter_op_parallelism_threads(8)
+PARAMETERS = {
+    "EPOCHS": EPOCHS,
+    "LABEL_SIZE": LABEL_SIZE,
+    "TARGET_PRODUCT": TARGET_PRODUCT,
+    "SIDE": SIDE,
+    "DATA_FORMAT": DATA_FORMAT
+}
+
 
 def create_ae_mlp(num_columns, num_labels, hidden_units, dropout_rates, ls=1e-2, lr=1e-3):
 
@@ -133,17 +139,9 @@ def load_data(format, data_path):
     return lazy_frame.select([pl.col("timestamp"), pl.col([pl.Float64, pl.Int64]).cast(pl.Float32)]).select(["timestamp", pl.col(pl.Float32)]).sort("timestamp")
 
 
-def feature_engineering(lazy_frame: pl.LazyFrame):
-    lazy_frame.select([
-        pl.col(pl.Float32).rolling_mean("60s", by="timestamp"),
-        pl.col(pl.Float32).rolling_mean("15m", by="timestamp"),
-        pl.col(pl.Float32).rolling_mean("60m", by="timestamp"),
-    ])
-
-
 def load_label(label_path):
-    df_label = pl.scan_csv(label_path).select(["signal", pl.col(
-        "base_timestamp").alias("timestamp").str.strptime(pl.Datetime("ns"))]).sort("timestamp")
+    df_label = pl.scan_csv(label_path).select(["signal", pl.col("base_timestamp").alias(
+        "timestamp").str.strptime(pl.Datetime("ns"))]).sort("timestamp")
     return df_label
 
 
@@ -185,116 +183,180 @@ def download_files():
         obj = S3_CLIENT.get_object(Bucket=BUCKET, Key=i["key"])
         file_to_disk(i["key"], obj["Body"], i["dateidx"])
 
+
 def filename_to_format(name: str):
     if "order_depth" in name:
         return "order_depth"
     elif "depth_imbalance" in name:
         return "depth_imbalance"
-    elif "taker"  in name:
+    elif "taker" in name:
         return "taker_positions"
     else:
         raise BaseException(name)
 
 
+def feature_engineering(df: pl.DataFrame):
+    window = [
+        "1s"
+        "1m",
+        "15m"
+        "60m",
+        "120m"
+    ]
+    df2 = None
+    df = df.sort("timestamp")
+    for period in window:
+        df3 = df.groupby_rolling(index_column="timestamp", period=period, closed="right").agg(
+            [
+                pl.col(pl.Float32).mean().map_alias(lambda x: x+"_mean"),
+                pl.col(pl.Float32).max().map_alias(lambda x: x+"_max"),
+                pl.col(pl.Float32).min().map_alias(lambda x: x+"_min"),
+                pl.col(pl.Float32).std().map_alias(lambda x: x+"_std"),
+            ]
+        )
+
+        if isinstance(df2, pl.DataFrame):
+            df3 = df3.join(df2, on="timestamp")
+        else:
+            df2 = df3
+
+    assert isinstance(df2, pl.DataFrame)
+    return df2.sort("timestamp").select([pl.col("timestamp"), pl.col(pl.Float32).pct_change().fill_null(0.).fill_nan(0.)])
+
+
 def dataiter(range_start: int, range_end: int):
     for idx in range(range_start, range_end):
-        stack: list[pl.LazyFrame] = []
+        stack: list[pl.DataFrame] = []
         for i in pathlib.Path(f"/tmp/input/data/{idx}").iterdir():
             lf = load_data(DATA_FORMAT, i)
-            stack.append(lf)
-            df = stack[0]
-            for df2 in stack[1:]:
-                df = df.join(df2, on="timestamp")
+            N = [pl.Int64, pl.Float64, pl.Float32, pl.Int32, pl.Int16]
+            df = lf.select(
+                [pl.col("timestamp"), pl.col(N).cast(pl.Float32)]).collect()
+            stack.append(df)
 
-            df_X = df.select(
-                [pl.col("timestamp"), pl.col(pl.Float32)]).collect()
+        df_X = stack[0]
+        for df2 in stack[1:]:
+            df_X = df_X.join(df2, on="timestamp",
+                             how="outer").sort("timestamp")
 
-            df_Y = load_label(f"/tmp/input/label/{idx}.csv")
-            df_Y = df_Y.join(df_X.lazy().select("timestamp"), on="timestamp", how="outer").sort(
-                "timestamp").fill_null(strategy="forward").fill_null("Timeout").select(["signal", "timestamp"]).collect()
-            df_X = df_X.lazy().join(df_Y.lazy().select("timestamp"), on="timestamp",
-                                    how="outer").sort("timestamp").fill_null(strategy="forward").fill_null(0.).collect()
+        df_X = df_X.sort("timestamp").fill_null(strategy="forward")
+        df_Y = load_label(f"/tmp/input/label/{idx}.csv")
+        df_Y = df_Y.groupby(pl.col("timestamp").dt.truncate(
+            "10s")).agg([pl.col("signal").last()]).collect()
 
-            prev = 0
-            for i in range(0, df_X.height, 5000*8):
-                if prev == i:
-                    continue
-                df_X_slice = df_X[prev:i]
-                df_Y_slice = df_Y[prev:i]
-                tup = df_X_slice.select(pl.col(pl.Float32)), df_Y_slice.select(pl.col("*").exclude("timestamp"))
-                yield tup
-                prev = i
+        df_Y = df_Y.join(df_X.select("timestamp"), on="timestamp", how="outer")
 
-            df_X_slice = df_X[prev:df_X.height]
-            df_Y_slice = df_Y[prev:df_X.height]
-            tup = df_X_slice.select(pl.col(pl.Float32)), df_Y_slice.select(pl.col("*").exclude("timestamp"))
-            yield tup
-    
+        df_Y = df_Y.fill_null(strategy="forward").fill_null(
+            "Timeout").sort("timestamp").select(["signal", "timestamp"])
+
+        df_X = df_X.lazy().join(df_Y.lazy().select("timestamp"), on="timestamp",
+                                how="outer").sort("timestamp").fill_null(strategy="forward").fill_null(0.).collect()
+        df_X = df_X.select(
+            [pl.col("timestamp"), pl.col(pl.Float32)]).sort("timestamp")
+        yield feature_engineering(df_X).sort("timestamp"), df_Y.fill_null("Timeout")
+
 
 def df_ready_up(range_start: int, range_end: int):
     df_tup = (None, None)
     for tup in dataiter(range_start, range_end):
         if isinstance(df_tup[0], pl.DataFrame) and isinstance(df_tup[1], pl.DataFrame):
-            df_tup = (df_tup[0].vstack(tup[0].select(df_tup[0].columns), in_place=True), df_tup[1].vstack(tup[1].select(df_tup[1].columns), in_place=True))
+            df_tup = (df_tup[0].vstack(tup[0].select(df_tup[0].columns), in_place=True), df_tup[1].vstack(
+                tup[1].select(df_tup[1].columns), in_place=True))
         else:
             df_tup = tup
-    assert isinstance(df_tup[0], pl.DataFrame) and isinstance(df_tup[1], pl.DataFrame)
-    return df_tup
+    assert isinstance(df_tup[0], pl.DataFrame) and isinstance(
+        df_tup[1], pl.DataFrame)
+    return df_tup[0].sort("timestamp").select(pl.col(pl.Float32).fill_nan(0.).fill_null(0.)).with_columns([pl.when(pl.col(pl.Float32).is_infinite()).then(0.).otherwise(pl.col(pl.Float32)).keep_name()]), df_tup[1].sort("timestamp")
+
 
 outcome = {}
+
+def dataiter_slice(df_X: pl.DataFrame, df_Y: pl.DataFrame):
+    prev = 0
+    for idx in range(0, df_X.height, 5000):
+        if prev != idx:
+            df_X_slice = df_X[prev:idx].select(pl.col(pl.Float32))
+            df_Y_slice = df_Y[prev:idx]
+            yield df_X_slice, df_Y_slice
+        prev = idx
+
+    yield df_X_slice.to_pandas(), df_Y_slice.to_pandas()
 def main():
     download_files()
-    def train_evaluate(side):
-        model = None
-        for tup in dataiter(0, 13):
-            df_X, _df_Y = tup
-            model = prepare_model(df_X.width)
-            break
 
-        assert model != None
+    def train_evaluate(side):
+        DATA_FORMAT_concat = "--".join(DATA_FORMAT)
+        modelname = f"{DATA_FORMAT_concat}_{side}_{TARGET_PRODUCT}_{LABEL_SIZE}"
         train = df_ready_up(0, 13)
-        df_X = train[0]
+        df_X = train[0].select(pl.col(pl.Float32))
         df_Y = train[1].select(pl.col("signal") == side)
-        print(df_X, df_Y)
+
         es = EarlyStopping(monitor='val_action_AUC', min_delta=1e-4, patience=10,
-                        mode='max', baseline=None, restore_best_weights=True, verbose=0)
+                           mode='max', baseline=None, restore_best_weights=True, verbose=0)
         print("X: all data loaded onto the memory: ",
-                df_X.shape, df_X.estimated_size(), flush=True)
+              df_X.shape, df_X.estimated_size(), flush=True)
         print("Y: all data loaded onto the memory: ",
-                df_Y.shape, df_Y.estimated_size(), flush=True)
-        history = model.fit(df_X.to_pandas(), df_Y.to_pandas(), validation_split=0.2, epochs=EPOCHS)  # type: ignore
-        print(history.history)
+              df_Y.shape, df_Y.estimated_size(), flush=True)
+        print(df_X.describe())
+        model = prepare_model(df_X.width)
+        history = model.fit(dataiter_slice(df_X, df_Y), batch_size=256, validation_batch_size=256, epochs=EPOCHS, callbacks=[es])  # type: ignore
+        print(history)
         test = df_ready_up(13, 23)
         df_testX = test[0]
         df_testY = test[1].select(pl.col("signal") == side)
         X, Y = df_testX.to_pandas(), df_testY.to_pandas()
-        predictions = model.predict(X)
-        print(predictions)
-        result = model.evaluate(X, Y)
-        
-        print(history)
+        predictions = model.predict(X, batch_size=256)
+        evaluation = model.evaluate(X, Y)
         side = side.lower()
-        DATA_FORMAT_concat = "--".join(DATA_FORMAT)
-        modelname = f"{DATA_FORMAT_concat}_{side}_{TARGET_PRODUCT}_{LABEL_SIZE}"
         model.save(f"/tmp/output/{modelname}")
-        save_outcome(modelname, history.history,predictions)
-    
+
+        print(history.history)
+        print(predictions)
+        print(evaluation)
+        save_outcome(modelname, history.history, predictions,
+                     evaluation, test[1].to_dicts())
+
     train_evaluate(SIDE)
-    
-def save_outcome(modename, history, predictions):
-    key = f"s3://{BUCKET}/model/{modename}"
-    json.dump(history, open("history.json", "w"))
-    
-    json.dump(predictions, open("predictions.json", "w"))
-    hashmap = {}
-    for key in os.environ.keys():
-        hashmap[key] = os.environ[key]
-    json.dump(hashmap, open("env.json", "w"))
-    S3_CLIENT.upload_fileobj(open("history.json", "r"), f"{key}/history.json")
-    S3_CLIENT.upload_fileobj(open("env.json", "r"), f"{key}/env.json")
-    S3_CLIENT.upload_fileobj(open("predictions.json", "r"), f"{key}/predictions.json")
+
+
+def save_outcome(modename, history, predictions, evaluation, signal):
+    key = f"model/{modename}"
+    hashmap = {
+        "history": history,
+        "evaluation": evaluation,
+        "parameters": PARAMETERS
+    }
+    pl.DataFrame({
+        "pred": predictions[2].tranpose(),
+        "signal": signal,
+    }).groupby(["pred", "signal"]).count().write_parquet("./conf_matrix.parquet")
+
+    jsondata = json.dumps(hashmap, cls=NumpyArrayEncoder)
+    fp = open("meta.json", "w")
+    fp.write(jsondata)
+    fp.flush()
+    fp.close()
+    S3_CLIENT.upload_fileobj(open("meta.json", "rb"),
+                             Bucket=BUCKET, Key=f"{key}/meta.json")
+    S3_CLIENT.upload_fileobj(open("meta.json", "rb"),
+                             Bucket=BUCKET, Key=f"{key}/conf_matrix.parquet")
+
+
+class NumpyArrayEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NumpyArrayEncoder, self).default(obj)
+
 
 print("starting")
 main()
 
 
+os.environ
+# %%

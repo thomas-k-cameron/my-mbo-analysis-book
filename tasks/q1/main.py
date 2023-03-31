@@ -9,13 +9,20 @@ import subprocess
 DATA_DIRECTORY = pathlib.Path("/tmp/input/")
 
 MOST_ACTIVE_PRODUCTS=["NK225", "NK225M", "JGBL", "TOPIX", "TOPIXM"]
-
+COLS = [
+    "time_passed_since_last_event_max",
+    "time_passed_since_last_event_min",
+    "existed_for",
+    "modify_count",
+    "fully_executed",
+    "order_book_id"
+]
 def load_data(date_idx):
     """
     return order_df, product_info_df
     """
-    df1 = pl.read_csv(DATA_DIRECTORY.joinpath(f"product_info_{date_idx}.csv"), infer_schema_length=500000)
-    df2 = pl.read_csv(DATA_DIRECTORY.joinpath(f"order_classification_{date_idx}.csv"))
+    df1 = pl.read_csv(DATA_DIRECTORY.joinpath(f"order_classification_{date_idx}.csv")).select(COLS)
+    df2 = pl.read_csv(DATA_DIRECTORY.joinpath(f"product_info_{date_idx}.csv"), infer_schema_length=500000)
     return df1, df2
 
 
@@ -23,8 +30,10 @@ SAVE_FIGURE = True
 
 
 def save_fig(g, filename):
+    print(os.listdir("/tmp/output"))
     if SAVE_FIGURE:
-        return g.savefig(f"/tmp/output/{filename}.jpg")
+        g.figure.savefig(f"/tmp/output/{filename}.jpg")
+        plt.clf()
     else:
         pass
 
@@ -48,11 +57,11 @@ def _create_pretty_scatterplot(_df: pl.DataFrame, marker="x"):
                 linewidth=linewidth, linestyle=linestyle, color=color)
 
     color = "green"
-    percentile = _df.select("min_reaction_time").drop_nulls().sort(
-        by="min_reaction_time").to_numpy().transpose()[0]
+    percentile = _df.select("time_passed_since_last_event_min").drop_nulls().sort(
+        by="time_passed_since_last_event_min").to_numpy().transpose()[0]
     percentile = np.percentile(percentile, range_zero2hundred)
-    ax, _tbl_df = _main(fully_executed, min_reaction_time_between, percentile, ax, color=color,
-                        marker=marker, use_df=_df.select(["min_reaction_time", "fully_executed"]).drop_nulls())
+    ax, _tbl_df = _main(fully_executed, min_time_between, percentile, ax, color=color,
+                        marker=marker, use_df=_df.select(["time_passed_since_last_event_min", "fully_executed"]).drop_nulls())
     plt.axvline(percentile[0], 0, line_max,
                 linewidth=linewidth, linestyle=linestyle, color=color)
     plt.axvline(percentile[len(percentile)-1], 0, line_max,
@@ -120,11 +129,6 @@ def _main(func, func2, percentile, ax=None, color=None, marker="x", use_df=None)
 def fully_executed(_df_dn):
     return _df_dn.filter(pl.col("fully_executed"))
 
-
-def is_deleted(_df_dn):
-    return _df_dn.filter(pl.col("deleted"))
-
-
 def modfiy_count_val(val, val2):
     return pl.col("modify_count").is_between(val, val2, "right")
 
@@ -135,11 +139,6 @@ def max_time_between(val, val2):
 
 def min_time_between(val, val2):
     return pl.col("time_passed_since_last_event_min").is_between(val, val2, "right")
-
-7
-def min_reaction_time_between(val, val2):
-    return pl.col("min_reaction_time").is_between(val, val2, "right")
-
 
 def existed_for(val, val2):
     return pl.col("existed_for").is_between(val, val2, "right")
@@ -172,14 +171,22 @@ def plot_options(product_info_df: pl.DataFrame, order_classification_df: pl.Data
     save_fig(ax, "all_future")
 
 
-def plot_near_expiration_target_products(product_info_df: pl.DataFrame, order_classification_df: pl.DataFrame):
+def plot_near_expiration_target_products():
+    order_df = None
     for product in MOST_ACTIVE_PRODUCTS:
-        records = product_info_df.filter(pl.col("product_info_financial_product") == "Future").filter(pl.col("product_family")==product).select("product_info_order_book_id").to_dicts()
-        id = records[0]["product_info_order_book_id"]
-        ax = _create_pretty_scatterplot(order_classification_df.filter(pl.col("order_book_id") == id))
-        ax.set_title(f"Execution rate for {product}")
+        for i in range(0, 23):
+            _order_df, _product_info_df = load_data(i)
+            records = _product_info_df.filter(pl.col("product_info_financial_product") == "Future").filter(pl.col("product_family")==product).sort("product_info_expiration_date").select("product_info_order_book_id").to_dicts()
+            id = records[0]["product_info_order_book_id"]
+            if isinstance(order_df, pl.DataFrame):
+                order_df = order_df.vstack(_order_df.filter(pl.col("order_book_id") == id).select(order_df.columns))
+            else:
+                order_df = _order_df.filter(pl.col("order_book_id") == id)
         
-    save_fig(ax, "most_active_products")
+        assert isinstance(order_df, pl.DataFrame)
+        ax = _create_pretty_scatterplot(order_df)
+        ax.set_title(f"Execution rate for {product}")
+        save_fig(ax, f"most_active_products_{product}")
 
 
 
@@ -187,22 +194,43 @@ def main():
     order_df, product_info_df = None, None
     print(os.curdir)
     print(os.listdir("."))
-    subprocess.run(["bash","./download-all.sh"])
-    for i in range(0, 23):
-        _order_df, _product_info_df = load_data(i)
-        if isinstance(order_df, pl.DataFrame) and isinstance(product_info_df, pl.DataFrame):
-            productinfo_projection = set(product_info_df.columns).intersection(set(_product_info_df.columns))
-            order_projection = set(_order_df.columns).intersection(set(order_df.columns))
-            order_df, product_info_df = order_df.select(order_projection).vstack(_order_df.select(order_projection)), product_info_df.select(productinfo_projection).vstack(_product_info_df.select(productinfo_projection))
-        else:
-            order_df, product_info_df = _order_df, _product_info_df
+    try:
+        os.mkdir("/tmp/output")
+    except:
+        pass
 
-    assert isinstance(order_df, pl.DataFrame)
-    assert isinstance(product_info_df, pl.DataFrame)
-    plot_future_nk225_nk225m(product_info_df, order_df)
-    plot_futures(product_info_df, order_df)
-    plot_options(product_info_df, order_df)
-    plot_near_expiration_target_products(product_info_df, order_df)
+    subprocess.run(["bash","./download-all.sh"])
+
+    plot = os.environ["PLOT"]
+
+    if "plot_near_expiration_target_products" == plot:
+        plot_near_expiration_target_products()
+    else:
+        for i in range(0, 23):
+            _order_df, _product_info_df = load_data(i)
+            if isinstance(order_df, pl.DataFrame) and isinstance(product_info_df, pl.DataFrame):
+                productinfo_projection = set(product_info_df.columns).intersection(set(_product_info_df.columns))
+                order_projection = set(_order_df.columns).intersection(set(order_df.columns))
+                order_df, product_info_df = order_df.select(order_projection).vstack(_order_df.select(order_projection)), product_info_df.select(productinfo_projection).vstack(_product_info_df.select(productinfo_projection))
+            else:
+                order_df, product_info_df = _order_df, _product_info_df
+
+            order_df.shrink_to_fit(True)
+            product_info_df.shrink_to_fit(True)
+
+        assert isinstance(order_df, pl.DataFrame)
+        assert isinstance(product_info_df, pl.DataFrame)
+        
+        
+        if "plot_future_nk225_nk225m" == plot:
+            plot_future_nk225_nk225m(product_info_df, order_df)
+        elif "plot_futures" == plot:
+            plot_futures(product_info_df, order_df)
+        elif "plot_options" == plot:
+            plot_options(product_info_df, order_df)
+        else:
+            raise ""
+        
     subprocess.run(["bash","./upload-all.sh"])
 
 

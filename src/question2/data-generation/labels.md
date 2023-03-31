@@ -51,9 +51,9 @@ It was easier to implement and I didn't have to think about what price to use it
 
 - NK225, TOPIX and JGBL
 
-These three contracts are the products with the biggest volume within our dataset.  
+These three contracts are the products that are most actively traded on Osaka exchange.  
 
-I learned that data you can find on contracts with smaller volume is largely different; Stock Options on Osaka is very queit (nothing really happens, few contracts experience 1 or 2 executions in a day sometime). Same can be said for most combo products.  
+I learned that data you can find on contracts with smaller volume is very different; Stock Options on Osaka is very queit (nothing really happens, few contracts sees 1 or 2 taker in a day sometime). Same can be said for many combo products.  
 
 It would be difficult to test the model with these quiet contracts, as you simply don't have the data.
 So, I thought that I should just focus on the most active ones.

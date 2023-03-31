@@ -1,0 +1,1 @@
+aws s3 cp /tmp/output/ s3://compute-assets-36607b9c2d934caa8bf7d19e0251bab6/artifacts/taskq1 --recursive
