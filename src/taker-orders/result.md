@@ -1,4 +1,48 @@
 # Research Question 2: Taker Orders
+
+## Summary
+Below plot is the visualization of generated data.
+
+![plot](./summary.png)
+
+- Reference Price  
+  Reference price tracks the execution price of the future contract.
+
+- Signal
+  This is a categorical value used to group 
+
+- Profit at Maturity Measured Against Reference Price
+  This tracks taker's expected profit at maturity, it uses reference price as hypothetical final settlement price.
+
+  Say, taker bought 5 call option at 300 whose strike price is 500.
+  If the reference price is 600, then 
+  - value at 0% moneyness is -200 * 5 = -1000. 
+  - value at 3% moneyness is -20 * 5 = -100.
+  - value at -3% moneyness is -300 * 5 = -1500.
+
+  The plot shows the value at moneyness of 3% and -3%.
+
+- Profit at Maturity Measured Against Reference Price un weigted 
+
+  Same the previous data except that value is dividedd by volume.
+  Say, taker bought 5 call option at 300 whose strike price is 500.
+  If the reference price is 600, then 
+  - value at 0% moneyness is -200. 
+  - value at 3% moneyness is -20.
+  - value at -3% moneyness is -300.
+
+- Aggregated volume
+  
+  This is the aggregated volume within a time window.
+
+- Number of executions
+  This tracks the number of executions observed
+
+- 
+
+## Statistical Summary
+
+
 - Unrealized Profit of Taker
 Take a look at the image below.
 []

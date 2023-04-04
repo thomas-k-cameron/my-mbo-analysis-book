@@ -2,7 +2,7 @@
 
 - [Project Overview](./overview.md)
 
-- [Research Question 1: Speed and Execution Rate](./question1/result.md)
+- [Research Question 1: Speed and Execution Rate](./execution-rate/result.md)
 
 - [Research Question 2: Taker Orders](./taker-orders/result.md)
 

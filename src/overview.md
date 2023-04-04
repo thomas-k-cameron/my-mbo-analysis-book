@@ -6,26 +6,20 @@ This is my personal research project about analyzing the market order-by-order u
       Yes, this is true.   
       *Slower* orders is more likely to be executed, though there are some context to it.
 
-  2. It is said that taker orders are driving force in the market, how can you visualize them?    
-    I plotted out a unrealized gain and expected profit at maturity with different window.   
-    It seems like it tends to correlate with market trends to some extent.
+  2. It is said that taker orders are driving force in the market, can they predict the market move?    
+       
+    I categorized each data point into different categories based on how the market moved on next 3600 seconds and checked the difference of each group's skew, variance, mean and kurtosis.
+    It appears that groups that recorded large market move does overlap with ones that did not.
+
+    I plotted out a unrealized gain and expected profit at maturity.   
 
   3. Do BBO spread reflect market quality for larger order?   
+    
     BBO spread is commonly used to measure market quality.  
-    BBO spread assumes that 
-    Average execution price of contracts for size Q fluctuates over time.  
+    Average execution price of contracts for order with bigger size fluctuates over time.  
     
-    
-  4. Can you predict the market movement with the data generated above?  
-    I couldn't make it work.  
-    I think I should've instead, focused on modeling it as a evolving probability distribution.  
-
-## Kaggle Dataset  
-  As part of my senior thesis, I made some of the dataset I'm using for this project partially available online.
-
-  - [Dataset](https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-osaka-20210301)
-  - [Notebook](https://www.kaggle.com/code/a53e93e57a1/analyzing-high-frequency-trader-by-order)
-
+  4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
+    I couldn't make it work.
 
 ## Dataset  
   Dataset is the snapshot of ITCH protocol message distributed on March 2021 at Osaka Exchange.   
@@ -33,13 +27,20 @@ This is my personal research project about analyzing the market order-by-order u
   Size of the data exceeds 200GB.  
 
   For my particular dataset, it contains the information necessary to rebuild the order book for every products available;
-  This includes, Options, Futures and Combination products.  
+  This includes, options, futures and combination products(calendar spread).  
 
 ## Technical Infrastructure  
   Data was stored on `AWS S3` and processed with spot instances of `AWS EC2` managed by `AWS Batch`.
 
 ## LOB Simluation Software   
   
-  Software for LOB reconstruction is developed from scratch based on the specification provided by JPX, solely by me.   
+  Software for LOB reconstruction is based on the specification provided by JPX and it is developed from scratch.   
   It is written in Rust.   
   Callback based interface allows you to capture updates that happens on the order book.
+
+  
+## Kaggle Dataset  
+  As part of my senior thesis, I made some of the dataset I'm using for this project partially available online.
+
+  - [Dataset](https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-osaka-20210301)
+  - [Notebook](https://www.kaggle.com/code/a53e93e57a1/analyzing-high-frequency-trader-by-order)
