@@ -99,6 +99,5 @@ def main():
         )
         jobid = response['jobId']
         print(jobid)
-        return
         
 main()
