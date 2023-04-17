@@ -20,11 +20,13 @@ def load_data():
     labeldf: dict[str, pl.DataFrame] = {}
     for i in os.listdir("/tmp/input"):
         if i.endswith(".csv"):
+            [_product, signal_size, _, _dateidx_csv] = i.split("_")
             _df = pl.read_csv("/tmp/input/"+i)
+            _df = _df.select([pl.col("base_timestamp").str.strptime(pl.Datetime("ns")).alias("timestamp"), pl.col(["signal"]).suffix(f"_{signal_size}")])
         else:
             _df = pl.read_parquet("/tmp/input/"+i)
+
         if "depth_imbalance_" in i:
-            _df = _df.with_columns(pl.col("timestamp").shift_and_fill(1, 0).alias("time_delta").cast(pl.Datetime("ns"))-pl.col("timestamp"))
             _df = _df.drop_nulls()
 
             if isinstance(df, pl.DataFrame):
@@ -35,9 +37,6 @@ def load_data():
             df.shrink_to_fit(in_place=True)
         else:
             [_product, signal_size, _, _dateidx_csv] = i.split("_")
-            _df = _df.select([pl.col("base_timestamp").str.strptime(pl.Datetime("ns")).alias("timestamp"), pl.col(["signal"]).suffix(f"_{signal_size}")])
-            
-            _df = _df.with_columns(pl.col("timestamp").shift_and_fill(1, 0).alias("time_delta").cast(pl.Datetime("ns"))-pl.col("timestamp"))
             _df = _df.drop_nulls()
 
             signal_cols.add(f"signal_{signal_size}")
@@ -49,7 +48,7 @@ def load_data():
             labeldf[signal_size].shrink_to_fit(in_place=True)
 
     keys = list(labeldf.keys())
-    _labeldf = labeldf[keys[0]].lazy().join(labeldf[keys[1]].lazy().select(pl.all().exclude("time_delta")), on="timestamp").join(labeldf[keys[2]].lazy().select(pl.all().exclude("time_delta")), on="timestamp")
+    _labeldf = labeldf[keys[0]].lazy().join(labeldf[keys[1]].lazy(), on="timestamp").join(labeldf[keys[2]].lazy(), on="timestamp")
     _labeldf = _labeldf.select([pl.col(list(signal_cols)).cast(pl.Categorical), pl.all().exclude(list(signal_cols))]).collect()
 
     assert isinstance(df, pl.DataFrame)
@@ -59,21 +58,24 @@ def load_data():
         if "spread" in i:
             col = col.alias("spread")
         elif "ask_price" in i:
-            col = col.alias("ask")
+            col = col.alias("ask_price")
         elif "bid_price" in i:
-            col = col.alias("bid")
+            col = col.alias("bid_price")
         else:
             continue
         
         cols.append(col)
         print(col)
     df2 = _labeldf.lazy().join(df.select(cols).lazy(), on="timestamp", how="outer")
+    df2 = df2.with_columns(pl.col(["ask", "bid", "spread"]).forward_fill())
+    df2 = df2.with_columns(pl.col(list(signal_cols)).forward_fill().fill_null("Timeout"))
+    df2 = df2.with_columns(pl.col("timestamp").shift_and_fill(1, 0).alias("time_delta").cast(pl.Datetime("ns"))-pl.col("timestamp"))
     print(df2)
     df2 = df2.sort("timestamp").with_columns(pl.col("time_delta").abs()).collect()
     print(df2)
     df2 = df2.drop_nulls().sort("timestamp").with_columns(pl.col("time_delta").cast(pl.Duration('ns')))
     print(df2.sort("time_delta"))
-    return df2.filter(pl.col("time_delta").abs() < pl.duration(hours=1))
+    return df2.filter(pl.col("time_delta").abs() < pl.duration(minutes=30))
 
 
 def main():

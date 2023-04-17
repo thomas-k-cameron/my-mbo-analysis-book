@@ -3,23 +3,25 @@ This is my personal research project about analyzing the market order-by-order u
 
 ## Research Question  
   1. Is it true that high-speed orders are more likely to get canceled?  
+    
       Yes, this is true.   
       *Slower* orders is more likely to be executed, though there are some context to it.
 
   2. It is said that taker orders are driving force in the market, can they predict the market move?    
-       
-    I categorized each data point into different categories based on how the market moved on next 3600 seconds and checked the difference of each group's skew, variance, mean and kurtosis.
-    It appears that groups that recorded large market move does overlap with ones that did not.
+      
+      I measured the taker's position in several different ways, and created a statistical summary.
 
-    I plotted out a unrealized gain and expected profit at maturity.   
+      Statistical summary shows that most variables shows different statiscial property before large market move.
 
-  3. Do BBO spread reflect market quality for larger order?   
+  3. Do market liquidity provide any information on market movement?   
     
-    BBO spread is commonly used to measure market quality.  
-    Average execution price of contracts for order with bigger size fluctuates over time.  
-    
+      - Market is more likely to move bigly when market is liquid
+      - I discovered that difference between average execution price (e.g. market order to acquire 5000 qty and 100 qty) is not constant and it fluctuates over time.
+      
   4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
-    I couldn't make it work.
+    I tried it by using machine learning model that worked well for financial market that I found on kaggle but I couldn't make it work.
+
+      I think it would've been better to model it as a stochastic process whose probability distribution evolves over time.
 
 ## Dataset  
   Dataset is the snapshot of ITCH protocol message distributed on March 2021 at Osaka Exchange.   

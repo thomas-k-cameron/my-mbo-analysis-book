@@ -1,6 +1,10 @@
 # Research Question 2: Taker Orders
 
 ## Summary
+
+- I generated data to keep track of, taker order's 
+
+## Overview of Variables
 Below plot is the visualization of generated data.
 
 ![plot](./summary.png)
