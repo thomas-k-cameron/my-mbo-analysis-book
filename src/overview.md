@@ -18,7 +18,7 @@ This dataset allows you to analyze every maker orders that was visible on the or
   3. Do market liquidity provide any information on market movement?   
       
       Yes, it seems like it.  
-      However, it also seems like 
+      But it's complicated.
       
   4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
 
