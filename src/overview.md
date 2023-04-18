@@ -1,5 +1,7 @@
-# Overview/Summary
+# Overview
 This is my personal research project about analyzing the market order-by-order using snapshot of ITCH message from Osaka Exchange.
+
+This dataset allows you to analyze every maker orders that was visible on the order book.
 
 ## Research Question  
   1. Is it true that high-speed orders are more likely to get canceled?  
@@ -14,14 +16,17 @@ This is my personal research project about analyzing the market order-by-order u
       Statistical summary shows that most variables shows different statiscial property before large market move.
 
   3. Do market liquidity provide any information on market movement?   
-    
-      - Market is more likely to move bigly when market is liquid
-      - I discovered that difference between average execution price (e.g. market order to acquire 5000 qty and 100 qty) is not constant and it fluctuates over time.
+      
+      Yes, it seems like it.  
+      However, it also seems like 
       
   4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
-    I tried it by using machine learning model that worked well for financial market that I found on kaggle but I couldn't make it work.
 
-      I think it would've been better to model it as a stochastic process whose probability distribution evolves over time.
+       No, I couldn't make it work.
+
+       I tried it by using machine learning model that worked well for financial market competition on kaggle.
+
+       I think it would've been better to model it as a stochastic process whose probability distribution evolves over time.
 
 ## Dataset  
   Dataset is the snapshot of ITCH protocol message distributed on March 2021 at Osaka Exchange.   
