@@ -4,7 +4,7 @@ Image below is the visualization of generated data.
 
 ![225](../../images/market_depth/nk225_market_depth_main_out.png)
 
-Best bid/ask helps you keep track of the 
+Best bid/ask is often used as a way to keep track of the market movement but it is not good at telling you how liquidity change over time.
 
 Effective Best Bid/Ask Price is measured as the average price of contracts you buy/sell when you place a market order of size \\(Q\\)
 

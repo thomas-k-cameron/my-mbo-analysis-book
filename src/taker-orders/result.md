@@ -2,9 +2,11 @@
 
 ## Summary
 
-- I generated data to keep track of, taker order's 
+- I measured taker orders by it's unrealized profit, volume and profitability of their position at maturity  
+- Products that I analyzed is Nikkei 225, TOPIX and Japanese Government Bond Future  
+- Statistical summary reveals that, underlying distribution of variable changes before large market move in many cases.
 
-## Overview of Variables
+## Graphical Overview of Generated Data
 Below plot is the visualization of generated data.
 
 ![plot](./summary.png)
@@ -78,7 +80,7 @@ Here is a phesudo code for calculating them.
   = -9000 + -4000
   = -13000
 ```
-- Unrealized Profit (Un-Weigted by Volume) 
+- Unrealized Profit (Un-Weigted by Volume)  
 
   Same as `Unrealized Profit` except that every executions are divided by it's volume.
 
@@ -98,7 +100,7 @@ Here is a phesudo code for calculating them.
   = -5000
 ```
 
-- Parameters
+- Parameters  
   Generated data have 2 variables;
   - Window size 
     Size of the window. 
@@ -122,36 +124,49 @@ func Signal(Current Bid Price, Current Ask Price, Every Best Bid/Ask Price in Ne
 }
 ```
 
-## Statistical Summary
-Here is a plot.
+## Result
+To sum up, I can say the following for each variable groups;
 
-![](./NK225.png)
+- Skew, Kurtosis  
+  - For most variables, Skew of Timeout group is somewhere around 0, while skew of Buy/Sell group shows more variance.  
+- Mean, Variance, 1st percentile and 99th percentile  
+  - Buy/Sell group tends to be close to 0  
+  - Some Timeout groups have larger/smaller value  
+- Product difference
+  - Overlap between Timeout group and others are more significant on JGBL, I'm suspecting that this is due to the smaller number of taker orders and volume 
 
-I inspected each variables by visualizing the statistical summary of each variables, grouped by it's corresponding signal.
+Here is a plot that shows the aggregate of statistical summary of the data for each product.  
+From left we have skew, kurtosis, variance, mean, 1% percentile and 99% percentile of the data.
 
-You can find the example data (here)[!TODO]
+The title tells you the parameter. For example, the first row says "NK225: window = 60 secs, signal_size = 50.0 JPY".
+This means, the plot uses Nikkei 225 future data, with window size of 60 seconds, and signal size of 50 JPY.
 
-I use skew, kurtosis, variance, mean, 1st percentile and 99th percentile of each variables .
-For skew, kurtosis, variance and mean, I normalized the data by,
+## Dataset
+Data used here can be found here.
+
+Data is normalized by,
 
 - converting each data point into percentile changes of it's previous data.
 
   e.g.
 
-|      |     after | original data |
-| ---: | --------: | ------------: |
-|    0 |       nan |            10 |
-|    1 |       0.1 |            11 |
-|    2 | -0.181818 |             9 |
+  |      |     after | original data |
+  | ---: | --------: | ------------: |
+  |    0 |       nan |            10 |
+  |    1 |       0.1 |            11 |
+  |    2 | -0.181818 |             9 |
 
 - removing outliers
   
-  Any data point that does is not between 1% ~ 99% percentile is filtered.
+  Any data point that is not between 1% ~ 99% percentile is filtered.
   
 - removing data points that did not change
   
   There were many data point which did not change from the previous value. Any data point that is `0` is removed.
 
-
-- I couldn't develop a model that can make money off market movement.
-- Upon inspecting the statistical summary, I discovered that there are many variables that `Timeout` does not overlap with `Buy` and/or `Sell` signal.
+## Nikkei Future
+![](./NK225.png)1
+## JGBL Future
+![](./JGBL.png)
+## TOPIX Future
+![](./TOPIX.png)
