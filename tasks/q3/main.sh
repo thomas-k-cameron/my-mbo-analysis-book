@@ -14,3 +14,4 @@ zstd -d --rm /tmp/input/*
 
 python3 main.py
 rm -r /tmp/*
+sleep 30

@@ -109,15 +109,21 @@ Below plot is the visualization of generated data.
   | Put option  | 1,000            | 100      | 200      |
 
 ## Result
-To sum up, I can say the following for each variable groups;
+I calculated the summary statistics of each variables after grouping each data points by it's signal.
+
+To sum up, I can say the following for each variable;
 
 - Skew, Kurtosis  
   - For most variables, Skew of Timeout group is somewhere around 0, while skew of Buy/Sell group shows more variance.  
 - Mean, Variance, 1st percentile and 99th percentile  
   - Buy/Sell group tends to be close to 0  
   - Some Timeout groups have larger/smaller value  
-- Product difference
-  - Overlap between Timeout group and others are more significant on JGBL, I'm suspecting that this is due to the smaller number of taker orders and volume 
+- Product Difference
+  - JGBL
+    - Overlap between Timeout group and others are more significant on JGBL, I'm suspecting that this is due to the smaller number of taker orders and volume 
+  - TOPIX 
+    - TOPIX's variable looks less scattered, this is coming from the lack of activity in it's options space.
+    - Option related variables are removed.
 
 Here is a plot that shows the aggregate of statistical summary of the data for each product.  
 From left we have skew, kurtosis, variance, mean, 1% percentile and 99% percentile of the data.
@@ -148,9 +154,11 @@ Data is normalized by,
   
   There were many data point which did not change from the previous value. Any data point that is `0` is removed.
 
-## Nikkei Future
+## Visualization of Statistical Summary
+
+### Nikkei Future
 ![](./NK225.png)1
-## JGBL Future
+### JGBL Future
 ![](./JGBL.png)
-## TOPIX Future
+### TOPIX Future
 ![](./TOPIX.png)

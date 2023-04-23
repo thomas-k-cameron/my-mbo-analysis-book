@@ -84,7 +84,7 @@ def main():
                 jobName.append(str(dic[i]))
             env.append({"name": i.upper(), "value": str(val)})
         
-        jobDefinition = "arn:aws:batch:us-east-2:879655802347:job-definition/4cpu-30gb:4"
+        jobDefinition = "arn:aws:batch:us-east-2:879655802347:job-definition/4cpu-30gb:7"
         jobQueue= "amd4cpu-ram30gb-storage100gb"
         response = CLIENT.submit_job(
             jobName="_".join(jobName),
@@ -99,6 +99,5 @@ def main():
         )
         jobid = response['jobId']
         print(jobid)
-        return 
         
 main()

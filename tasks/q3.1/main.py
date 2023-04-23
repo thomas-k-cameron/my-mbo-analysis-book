@@ -16,8 +16,16 @@ s3conn.download_file(BUCKET, os.environ["FILE"], PATH)
 
 
 def main(path: pathlib.Path, hue_col, x_col, ax1=None, ax2=None):
-    df = pl.read_parquet(path)
-    print(df)
+    filcond = pl.col("")
+    if x_col == "ask_price":
+        filcond = pl.col("ask_can_be_filled")
+    elif x_col == "bid_price":
+        filcond = pl.col("bid_can_be_filled")
+    elif x_col == "spread":
+        filcond = pl.all([pl.col("ask_can_be_filled"), pl.col("bid_can_be_filled")])
+
+    df = pl.read_parquet(path).filter(filcond).sort("timestamp")
+    print(x_col, df.shape)
     td = pl.col("time_delta").cast(pl.UInt64)
     labels = ["Buy", "Sell", "Timeout"]
     g = sns.histplot(
@@ -33,7 +41,7 @@ def main(path: pathlib.Path, hue_col, x_col, ax1=None, ax2=None):
         hue_order=labels
     )
     [product, qty1, qty2] = path.name.replace(".parquet", "").split("_")
-    g.set_title(f"{product}: `Depth Imalance`({qty1}, {qty2})")
+    g.set_title(f"{product}: `Depth Imalance`({x_col}, {hue_col}, {qty1}, {qty2})")
     g = sns.histplot(data=df.select([x_col, td]).to_pandas(), x=x_col, ax=ax2, bins=100,  weights="time_delta")
     g.set_yscale("log")
     plt.tight_layout()
@@ -46,21 +54,32 @@ def pic_file_path_func(path: pathlib.Path, signal: str):
 
 
 def create_set(path, signal):
-    savefig = "/tmp/output/main.png"
-    for i in ["ask", "bid", "spread"]:
+    import time
+    savefig = "/tmp/output/"
+    stack = []
+    for i in ["ask_price", "bid_price", "spread"]:
+        plt.close()
         f, ax = plt.subplots(2, 1, figsize=(7, 5), sharex=True)
         sns.despine(f)
         h, l = ax[0].get_legend_handles_labels()
         ax[0].legend(handles = h, loc="upper left", bbox_to_anchor=(1, 1), labels=l)
         main(path, signal, i, ax1=ax[0], ax2=ax[1])
-        f.savefig(savefig)
-        key = "artifacts/depth-imbalance-spread-pics/"+"_".join([i, signal.replace("signal_", ""), FILE.name.replace(".parquet", ".png")])
-        s3conn.upload_fileobj(
-            open(savefig, "rb"),
+        filename = "_".join([i, signal.replace("signal_", ""), FILE.name.replace(".parquet", ".png")])
+        savepath = savefig+filename
+        f.savefig(savepath)
+        key = "artifacts/depth-imbalance-spred-filter-pics/"+filename
+        stack.append((savepath, key))
+
+    time.sleep(1)
+    for i in stack:
+        print(i)
+        asdf = s3conn.upload_fileobj(
+            open(i[0], "rb"),
             BUCKET,
-            key
+            i[1]
         )
-        print(key)
+        print(asdf)
+        time.sleep(1)
 
 
 create_set(PATH, SIGNAL)

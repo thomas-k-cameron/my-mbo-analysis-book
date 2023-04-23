@@ -61,13 +61,17 @@ def load_data():
             col = col.alias("ask_price")
         elif "bid_price" in i:
             col = col.alias("bid_price")
+        elif "can_be_filled" in i:
+            if "ask" in i:
+                col = col.alias("ask_can_be_filled")
+            elif "bid" in i:
+                col = col.alias("bid_can_be_filled")
         else:
             continue
-        
         cols.append(col)
         print(col)
-    df2 = _labeldf.lazy().join(df.select(cols).lazy(), on="timestamp", how="outer")
-    df2 = df2.with_columns(pl.col(["ask", "bid", "spread"]).forward_fill())
+    df2 = _labeldf.lazy().join(df.select(cols).lazy(), on="timestamp", how="outer").sort("timestamp")
+    df2 = df2.with_columns(pl.col(["ask_price", "bid_price", "spread", "ask_can_be_filled"]).forward_fill())
     df2 = df2.with_columns(pl.col(list(signal_cols)).forward_fill().fill_null("Timeout"))
     df2 = df2.with_columns(pl.col("timestamp").shift_and_fill(1, 0).alias("time_delta").cast(pl.Datetime("ns"))-pl.col("timestamp"))
     print(df2)
