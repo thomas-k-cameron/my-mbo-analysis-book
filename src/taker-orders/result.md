@@ -3,7 +3,7 @@
 ## Summary
 
 - I measured taker orders by it's unrealized profit, volume and profitability of their position at maturity  
-- Products that I analyzed is Nikkei 225, TOPIX and Japanese Government Bond Future  
+- Products that I analyzed is Nikkei 225, TOPIX and Japanese Government Bond Future; For Nikkei 225 and TOPIX, mini variant is included.
 - Statistical summary reveals that, underlying distribution of variable changes before large market move in many cases.
 
 ## Graphical Overview of Generated Data
@@ -16,113 +16,97 @@ Below plot is the visualization of generated data.
 
 - Signal
 
-  This is a categorical value that indicates the market move in next 3600 seconds
-  It has 3 possible values:
-  - Buy
-    Indicates that Ask Price  in less than 3600 seconds
-  - Sell
-  - Timeout
+  This is a categorical value that takes one of 3 value;
+  | Value   | Condition                                                                                                                    |
+  | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
+  | Buy     | If you `buy` the contract at `ask price`, you can turn `X` point of profit by selling at `bid price` in next `3600 seconds`  |
+  | Sell    | If you `sell` the contract at `bid price`, you can turn `X` point of profit by selling at `ask price` in next `3600 seconds` |
+  | Timeout | None of the condition were met.                                                                                              |
 
 - Profit at Maturity Measured Against Reference Price  
-  This tracks taker's expected profit at maturity, it uses reference price as hypothetical final settlement price.
+  This tracks taker's profit at maturity, it uses reference price as hypothetical final settlement price.
 
-  Say, taker bought 5 call option at 300 whose strike price is 500.
-  If the reference price is 600, then 
-  - value of 0% moneyness is -200 * 5 = -1000. 
-  - value of 3% moneyness is -20 * 5 = -100.
-  - value of -3% moneyness is -300 * 5 = -1500.
+  Say, in last `T` seconds, we observed following transactions.
+  | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
+  | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
+  | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
+  | Mini Future | Sell         | 10       | ---          | 20,100            | 11:00            |
+  | Call option | Buy          | 10       | 20,000       | 500               | 10:30            |
+  | Put option  | Sell         | 10       | 20,000       | 300               | 10:25            |
 
-  The plot shows the value at moneyness of 3% and -3%.
+
+  When the reference price is 20,000JPY, value at maturity would be, 
+  | Product     | -3% (19,400) | -2%(19,600) | -1%(19,800) | 0%(20,000) | 1%(20,200) | 2%(20,400) | 3%(20,600) |
+  | ----------- | ------------ | ----------- | ----------- | ---------- | ---------- | ---------- | ---------- |
+  | Future      | -5,000       | -3,000      | -1,000      | 1,000      | 3,000      | 5,000      | 7,000      |
+  | Mini Future | 700          | 500         | 300         | 100        | -100       | -300       | -500       |
+  | Call option | -5,000       | -5,000      | -5,000      | -5,000     | -3,000     | -1,000     | 1,000      |
+  | Put option  | -3,000       | -1,000      | 1,000       | 3,000      | 3,000      | 3,000      | 3,000      |
 
 - Profit at Maturity Measured Against Reference Price *un-weigted* by volume
 
-  Same the previous data except that value is dividedd by volume.
-  Say, taker bought 5 call option at 300 whose strike price is 500.
-  If the reference price is 600, then 
-  - value of 0% moneyness is -200. 
-  - value of 3% moneyness is -20.
-  - value of -3% moneyness is -300.
+  Say, in last `T` seconds, we observed following transactions (same as the previous example).
+  | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
+  | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
+  | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
+  | Mini Future | Sell         | 10       | ---          | 20,100            | 11:00            |
+  | Call option | Buy          | 10       | 20,000       | 500               | 10:30            |
+  | Put option  | Sell         | 10       | 20,000       | 300               | 10:25            |
+
+
+  When the reference price is 20,000JPY, value at maturity would be, 
+  | Product     | -3% (19,400) | -2%(19,600) | -1%(19,800) | 0%(20,000) | 1%(20,200) | 2%(20,400) | 3%(20,600) |
+  | ----------- | ------------ | ----------- | ----------- | ---------- | ---------- | ---------- | ---------- |
+  | Future      | -500         | -300        | -100        | 100        | 300        | 500        | 700        |
+  | Mini Future | 70           | 50          | 30          | 10         | -10        | -30        | -50        |
+  | Call option | -500         | -500        | -500        | -500       | -300       | -100       | 100        |
+  | Put option  | -300         | -100        | 100         | 300        | 300        | 300        | 300        |
 
 - Aggregated volume
   
   This is the aggregated volume within a time window.
-  
-  If the window is 30 minutes and,
-  1. 5 contracts executed on 10:10 and,
-  2. 2 contracts executed on 10:20 then,
-  value is 7.
 
 - Number of executions
   
   This tracks the number of executions observed.
 
-  If the window is 30 minutes and,
-  1. 5 contracts executed on 10:10 and,
-  2. 2 contracts executed on 10:20 then,
-  value is 2.
-
 - Unrealized Profit  
 
-  This measures how much money the taker would make if they could sell it at the best bid/ask price.
+  Say, in last `T` seconds, we observed following transactions (same as the previous example).
+  | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
+  | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
+  | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
+  | Mini Future | Sell         | 10       | ---          | 20,100            | 11:00            |
+  | Call option | Buy          | 10       | 20,000       | 500               | 10:30            |
+  | Put option  | Sell         | 10       | 20,000       | 300               | 10:25            |
 
-  Say, 
-  1. 4 contracts were bought by taker at 30,000 and
-  2. 3 contracts were bought by taker at 29,500 and
-  3. 2 contract was sold by taker at 29,000 and,
-  4. 1 contract was sold by taker at 29,500 and,
-  5. Current best bid/ask is 28,500/30,500
-  Then, the value is -13000.
-  
-Here is a phesudo code for calculating them.
-```
-  (Sum (Best Ask Price - Taker's Buy Price) * Volume ) + (Sum (Best Bid Price - Taker's Sell Price) * Volume )
-  = (((28,500 - 30,000) * 4) + ((28,500 - 29,500) * 3)) + (((29,000 - 30,500) * 2) + ((29,500 - 30,500) * 1))
-  = -9000 + -4000
-  = -13000
-```
+
+  Unrealized gains at given best bid/ask is;
+  | Product     | unrealized gains | best bid | best ask |
+  | ----------- | ---------------- | -------- | -------- |
+  | Future      | 11,000           | 21,000   | 21,100   |
+  | Mini Future | 9,000            | 21,000   | 21,100   |
+  | Call option | 10,000           | 1,500    | 1,700    |
+  | Put option  | 10,000           | 100      | 200      |
+
 - Unrealized Profit (Un-Weigted by Volume)  
 
-  Same as `Unrealized Profit` except that every executions are divided by it's volume.
+  Say, in last `T` seconds, we observed following transactions (same as the previous example).
+  | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
+  | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
+  | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
+  | Mini Future | Sell         | 10       | ---          | 20,100            | 11:00            |
+  | Call option | Buy          | 10       | 20,000       | 500               | 10:30            |
+  | Put option  | Sell         | 10       | 20,000       | 300               | 10:25            |
 
-  Say, 
-  1. 4 contracts were bought by taker at 30,000 and
-  2. 3 contracts were bought by taker at 29,500 and
-  3. 2 contract was sold by taker at 29,000 and,
-  4. 1 contract was sold by taker at 29,500 and,
-  5. Current best bid/ask is 28,500/30,500
-  Then, the value is
 
-Here is a phesudo code for calculating them.
-```
-  (Sum (Best Ask Price - Taker's Buy Price)) + (Sum (Taker's Sell Price - Best Bid Price))
-  = (((28500 - 30000) ) + ((28500 - 29500) )) + (((29000 - 30500) ) + ((29500 - 30500) ))
-  = -2500 + -2500
-  = -5000
-```
-
-- Parameters  
-  Generated data have 2 variables;
-  - Window size 
-    Size of the window. 
-    The data I generated takes 60 seconds, 600 seconds, 3600 seconds, 9000 seconds, or entire business day.
-  - Signal size 
-    Signal is a categorical value which indicates which direction the market has moved.
-
-Here is a psuedo code.
-```
-func Signal(Current Bid Price, Current Ask Price, Every Best Bid/Ask Price in Next 3600 seconds) {
-    `Condition For Buy` = Best Ask Price >= (Current Bid Price + Q) 
-    `Condition For Sell` = Best Bid Price >= (Current Bid Price + Q)
-    
-    if `Condition For Buy` is satisfied in next 3600 seconds before `Condition For Sell` is satisfied {
-      return "Signal Is Sell"
-    } else if `Condition For Sell` is satisfied in next 3600 seconds before `Condition For Buy` is satisfied {
-      return "Signal Is Buy"
-    } else if `Condition For Sell` and `Condition For Buy` is NOT satisfied {
-      return "Signal is Timeout"
-    }
-}
-```
+  Unrealized gains at given best bid/ask is;
+  | Product     | unrealized gains | best bid | best ask |
+  | ----------- | ---------------- | -------- | -------- |
+  | Future      | 1,100            | 21,000   | 21,100   |
+  | Mini Future | 900              | 21,000   | 21,100   |
+  | Call option | 1,000            | 1,500    | 1,700    |
+  | Put option  | 1,000            | 100      | 200      |
 
 ## Result
 To sum up, I can say the following for each variable groups;
