@@ -1,4 +1,11 @@
 # Overview
+- [Overview](#overview)
+  - [Research Question](#research-question)
+  - [Dataset](#dataset)
+  - [Technical Infrastructure](#technical-infrastructure)
+  - [LOB Simluation Software](#lob-simluation-software)
+  - [Kaggle Dataset](#kaggle-dataset)
+
 This is my personal research project about analyzing the market order-by-order using snapshot of ITCH message from Osaka Exchange.
 
 This dataset allows you to analyze every maker orders that was visible on the order book.
@@ -11,8 +18,7 @@ This dataset allows you to analyze every maker orders that was visible on the or
 
   2. It is said that taker orders are driving force in the market, can they predict the market move?    
       
-      I measured the taker's position in several different ways, and created a statistical summary.
-
+      I measured the taker's position in several different ways, and created a statistical summary.  
       Statistical summary shows that most variables shows different statiscial property before large market move.
 
   3. Do market liquidity provide any information on market movement?   
@@ -22,8 +28,7 @@ This dataset allows you to analyze every maker orders that was visible on the or
       
   4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
 
-       No, I couldn't make it work.
-
+       No, I couldn't make it work.  
        I tried it by using machine learning model that worked well for financial market competition on kaggle.
 
        I think it would've been better to model it as a stochastic process whose probability distribution evolves over time.

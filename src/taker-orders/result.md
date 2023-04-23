@@ -1,4 +1,14 @@
 # Research Question 2: Taker Orders
+- [Research Question 2: Taker Orders](#research-question-2-taker-orders)
+  - [Summary](#summary)
+  - [Graphical Overview of Generated Data](#graphical-overview-of-generated-data)
+  - [Result](#result)
+  - [Dataset](#dataset)
+  - [Future Direction](#future-direction)
+  - [Visualization of Statistical Summary](#visualization-of-statistical-summary)
+    - [Nikkei Future](#nikkei-future)
+    - [TOPIX Future](#topix-future)
+    - [JGBL Future](#jgbl-future)
 
 ## Summary
 
@@ -119,7 +129,9 @@ To sum up, I can say the following for each variable;
   - Buy/Sell group tends to be close to 0  
   - Some Timeout groups have larger/smaller value  
 - Product Difference
-  - JGBL
+  - NK225  
+    - Compared to other products, Buy/Sell and Timeout has less overlap. It can be said that this is coming from it's Japan's most active options market.
+  - JGBL  
     - Overlap between Timeout group and others are more significant on JGBL, I'm suspecting that this is due to the smaller number of taker orders and volume 
   - TOPIX 
     - TOPIX's variable looks less scattered, this is coming from the lack of activity in it's options space.
@@ -154,11 +166,14 @@ Data is normalized by,
   
   There were many data point which did not change from the previous value. Any data point that is `0` is removed.
 
+## Future Direction
+
 ## Visualization of Statistical Summary
 
 ### Nikkei Future
-![](./NK225.png)1
-### JGBL Future
-![](./JGBL.png)
+![](./NK225.png)
 ### TOPIX Future
 ![](./TOPIX.png)
+### JGBL Future
+![](./JGBL.png)
+

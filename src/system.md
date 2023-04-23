@@ -1,21 +1,30 @@
 # Overview of System/Tools/Software
+- [Overview of System/Tools/Software](#overview-of-systemtoolssoftware)
+  - [Current Implementation](#current-implementation)
+    - [Order Book Simulator](#order-book-simulator)
+    - [Cloud Environment](#cloud-environment)
+  - [Future Direction](#future-direction)
+    - [Order Book](#order-book)
+    - [Things to automate](#things-to-automate)
 
 ## Current Implementation
 
-- Order Book Simulator
+### Order Book Simulator
+
 Order book simluator is built from scratch with Rust.  
 It works with Osaka Exchange's ITCH procotol message.
 
-- Cloud Environment
+### Cloud Environment
 I used AWS, but I believe same can be done in other platform as well.
 
-Data is stored on S3 bucket. It appeared to be lot cheaper, faster, and easier to iterate than DBMS. 
+- Data Storage   
+    All data is stored on S3.     
+    Compared to DB systems like DynamoDB or MySQL, it is lot cheaper.  
+    You cannot execute complex queries but I didn't need it.
 
-Processing of data makes heavy use of spot instances (EC2 and Fargate) and it is scheduled by AWS Batch.
-
-- mdbook
-This website is built with mdbook.
-
+- Computing  
+    Data is processed with EC2/Fargate scheduled with Batch.  
+    I used Spot instances exclusively to optimize the cost.
 
 ## Future Direction
 ### Order Book
@@ -34,6 +43,7 @@ Performance optimization will allow you to,
 - work in faster iteration 
 
 ### Things to automate
+- Reducing the file size to allow use of solutions such as S3 Batch operations to further drive the cost down.
 - Indexing of generated data
 - CI/DC
 - Benchmarking... etc

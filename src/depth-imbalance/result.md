@@ -1,6 +1,17 @@
 # Research Question 3: Depth Imbalance
+- [Research Question 3: Depth Imbalance](#research-question-3-depth-imbalance)
+  - [Overview](#overview)
+    - [Market Depth](#market-depth)
+  - [Results](#results)
+  - [Future Direction](#future-direction)
 
-## Visualized Data
+## Overview
+### Market Depth
+Image below is the visualization of market depth at different quantity.
+
+![225](../../images/market_depth/nk225_market_depth_main_out.png)
+
+
 
 ## Results
 
