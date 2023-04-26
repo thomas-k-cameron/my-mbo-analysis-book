@@ -15,24 +15,37 @@ s3conn = boto3.client("s3")
 s3conn.download_file(BUCKET, os.environ["FILE"], PATH)
 
 
-def main(path: pathlib.Path, hue_col, x_col, ax1=None, ax2=None):
+def main(path: pathlib.Path, hue_col, x_col_str, ax1=None, ax2=None):
     filcond = pl.col("")
-    if x_col == "ask_price":
+    x_col = pl.col("")
+    if x_col_str == "ask_price":
+        x_col = pl.col(x_col_str)
         filcond = pl.col("ask_can_be_filled")
-    elif x_col == "bid_price":
+    elif x_col_str == "bid_price":
+        x_col = pl.col(x_col_str)
         filcond = pl.col("bid_can_be_filled")
-    elif x_col == "spread":
-        filcond = pl.all([pl.col("ask_can_be_filled"), pl.col("bid_can_be_filled")])
+    elif x_col_str == "spread":
+        x_col = pl.col("bid_price") - pl.col("ask_price").abs()
+        filcond = pl.all([pl.col("ask_can_be_filled"),
+                         pl.col("bid_can_be_filled")])
 
-    df = pl.read_parquet(path).filter(filcond).sort("timestamp")
-    print(x_col, df.shape)
+    df = pl.read_parquet(path).sort("timestamp")
+
+    df1 = df.filter(filcond)
+    df2 = df.filter(filcond.is_not())
     td = pl.col("time_delta").cast(pl.UInt64)
-    labels = ["Buy", "Sell", "Timeout"]
+    cols = [x_col.alias(x_col_str), td, pl.col(hue_col).cast(pl.Utf8)]
+    df2 = df2.with_columns(
+        pl.repeat(value="CanNotBeFilled", n=df2.height, name=hue_col, eager=True))
+    df = df1.select(cols).vstack(df2.select(cols))
+
+    print(x_col, df.shape)
+
+    labels = ["Buy", "Sell", "Timeout", "CanNotBeFilled"]
     g = sns.histplot(
-        df.select([pl.col(x_col), td, pl.col(
-            hue_col).cast(pl.Utf8)]).to_pandas(),
+        df.to_pandas(),
         weights="time_delta",
-        x=x_col,
+        x=x_col_str,
         hue=hue_col,
         multiple="fill",
         linewidth=.0,
@@ -41,8 +54,10 @@ def main(path: pathlib.Path, hue_col, x_col, ax1=None, ax2=None):
         hue_order=labels
     )
     [product, qty1, qty2] = path.name.replace(".parquet", "").split("_")
-    g.set_title(f"{product}: `Depth Imalance`({x_col}, {hue_col}, {qty1}, {qty2})")
-    g = sns.histplot(data=df.select([x_col, td]).to_pandas(), x=x_col, ax=ax2, bins=100,  weights="time_delta")
+    g.set_title(
+        f"{product}: `Depth Imalance`({x_col_str}, {hue_col}, {qty1}, {qty2})")
+    g = sns.histplot(data=df.select([x_col_str, td]).to_pandas(
+    ), x=x_col_str, ax=ax2, bins=100,  weights="time_delta")
     g.set_yscale("log")
     plt.tight_layout()
 
@@ -62,12 +77,14 @@ def create_set(path, signal):
         f, ax = plt.subplots(2, 1, figsize=(7, 5), sharex=True)
         sns.despine(f)
         h, l = ax[0].get_legend_handles_labels()
-        ax[0].legend(handles = h, loc="upper left", bbox_to_anchor=(1, 1), labels=l)
+        ax[0].legend(handles=h, loc="upper left",
+                     bbox_to_anchor=(1, 1), labels=l)
         main(path, signal, i, ax1=ax[0], ax2=ax[1])
-        filename = "_".join([i, signal.replace("signal_", ""), FILE.name.replace(".parquet", ".png")])
+        filename = "_".join(
+            [i, signal.replace("signal_", ""), FILE.name.replace(".parquet", ".png")])
         savepath = savefig+filename
         f.savefig(savepath)
-        key = "artifacts/depth-imbalance-spred-filter-pics/"+filename
+        key = "artifacts/depth-imbalance-spread-filter-pics-2/"+filename
         stack.append((savepath, key))
 
     time.sleep(1)
