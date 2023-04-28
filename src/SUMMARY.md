@@ -12,6 +12,8 @@
 
 - [Research Question 4: Predicting Market Move](./predicting-market-move/result.md)
 
+- [Extra Research: long 30 days federal fund rate with covered call](./extra-research/result.md)
+
 - [Future Direction](./future-direction/overview.md)
     - [Software Engineering And Cloud Computing](./future-direction/software-engineering-and-cloud-computing.md)
     - [Prediction Machine](./future-direction/prediction-machine.md)

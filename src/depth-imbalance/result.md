@@ -13,9 +13,9 @@
   - [Future Direction](#future-direction)
 
 ## Summary
-- Market liquidity is measured by *what the average execution price of FOK market order would be at given tick of an orderbook*
-- Market tends to offer more trading opportunities when order book is more liquid
-- However, there are some details to it.
+- Market tends to offer more trading opportunities when order book is more liquid; However, there are some details to it
+- Market depth is *what the average execution price of FOK market order would be at given tick of an orderbook*
+- Market liquidity is measured in difference between average execution price of market order of size Q1, and Q2 (Q1 < Q2)
 
 ## Overview of Data
 ### Market Depth
@@ -178,23 +178,21 @@ This visualization is not good at helping
 ![](images2/bid_price_15000_TOPIX_1_2000.png)
 
 
+
 ## Future Direction
-I measured market liquidity by average execution price of an order of size `Q`.    
-It revealed that market doesn't always have enough order to fill the order when size of Q becomes bigger.
+I think liquidity is something you can look at to understand market movement, and here are some list of things that I think that I can use to figure out.
+Here are some list of things that I 
 
-I believe this chapter reveals that there are lot to learn from order book's liquidity.
+- Calculate confidence interval to figure out how many observations you need to use this data for predicting market move
+- Do total number of orders/contracts available on order book affect the market in anyway?
+  We learned that order book may not have enough orders to satisfy large orders at given point in time.  
+  I simply filtered these observations for this project but there should be something you can learn about it.
+- Clustering orders by different quantity/speed or other factors
+  Over 99% of maker order's size is less than `10`, and most of them are just `1`.  
+  However, there are some orders whose size is as big as 5000.
 
-I can come up with few other ways that too further help improve the understanding of the market;
+  Large order can have strong influence over the metric I used.  
+  There might be something that I can laern by filtering large orders.  
+  Also, I might be able to learn something by the behaviour of larger orders too.
 
-- Summing quantity of all maker orders on order book  
-I learned that order book doesn't have infinite 
 
-- Cluster orders by different quantity and speed
-Over 99% of maker order's size is less than `10`, and most of them are just `1`.  
-However, there are some orders whose size is as big as 5000.
-
-Large order can have strong influence over the metric I used.  
-There might be something that I can laern by filtering large orders.  
-Also, I might be able to learn something by the behaviour of larger orders too.
-
-Overall, I think liquidity is something you can look at to understand market movement.

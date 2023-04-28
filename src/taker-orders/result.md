@@ -4,7 +4,6 @@
   - [Graphical Overview of Generated Data](#graphical-overview-of-generated-data)
   - [Result](#result)
   - [Dataset](#dataset)
-  - [Future Direction](#future-direction)
   - [Visualization of Statistical Summary](#visualization-of-statistical-summary)
     - [Nikkei Future](#nikkei-future)
     - [TOPIX Future](#topix-future)
@@ -181,7 +180,6 @@ Data is normalized by,
   
   There were many data point which did not change from the previous value. Any data point that is `0` is removed.
 
-## Future Direction
 
 ## Visualization of Statistical Summary
 
