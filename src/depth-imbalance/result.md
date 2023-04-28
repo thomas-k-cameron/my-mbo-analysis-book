@@ -138,25 +138,25 @@ It shows that market is more likely to move when the depth imbalance is closer t
 Let's take a look at some examples.
 ### More trading opportunities when the depth imbalance is closer to 0
 
-  - with Deep Orders
+- with Deep Orders
 ![](images2/ask_price_500000_NK225_1_5000.png)
 
-  - Sallower Orders Only
+- Sallower Orders Only
 ![](images2/ask_price_15000_TOPIX_1_500.png)
-
-  - Without Shallower Orders
-![](images2/ask_price_500_JGBL_1_2000.png)
 
 ### More trading opportunities when the depth imbalance is further from 0
 - With Deep Order
-  ![](images2/ask_price_500_JGBL_1_2000.png)
+![](images2/ask_price_500_JGBL_1_2000.png)
 - With Shallower Orders
-  ![](images2/ask_price_500000_NK225_1_100.png)
+![](images2/ask_price_500000_NK225_1_100.png)
+
+- Without Shallower Orders
+![](images2/ask_price_500_JGBL_1_2000.png)
 
 ### Trading opportunities on less-commonly observed area
 I discovered that there are examples where you get higher chance of trading opportunities 
 
-  ![](images2/bid_price_15000_TOPIX_1_500.png)
+![](images2/bid_price_15000_TOPIX_1_500.png)
 
 
 ### Examples how removal of illiquid moments affect the visualization

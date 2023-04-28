@@ -32,16 +32,13 @@ def main(path: pathlib.Path, hue_col, x_col_str, ax1=None, ax2=None):
     df = pl.read_parquet(path).sort("timestamp")
 
     df1 = df.filter(filcond)
-    df2 = df.filter(filcond.is_not())
     td = pl.col("time_delta").cast(pl.UInt64)
     cols = [x_col.alias(x_col_str), td, pl.col(hue_col).cast(pl.Utf8)]
-    df2 = df2.with_columns(
-        pl.repeat(value="CanNotBeFilled", n=df2.height, name=hue_col, eager=True))
-    df = df1.select(cols).vstack(df2.select(cols))
+    df = df1.select(cols)
 
     print(x_col, df.shape)
 
-    labels = ["Buy", "Sell", "Timeout", "CanNotBeFilled"]
+    labels = ["Buy", "Sell", "Timeout"]
     g = sns.histplot(
         df.to_pandas(),
         weights="time_delta",
