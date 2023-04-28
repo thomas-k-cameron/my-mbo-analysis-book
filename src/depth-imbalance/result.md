@@ -8,9 +8,8 @@
   - [Results](#results)
     - [More trading opportunities when the depth imbalance is closer to 0](#more-trading-opportunities-when-the-depth-imbalance-is-closer-to-0)
     - [More trading opportunities when the depth imbalance is further from 0](#more-trading-opportunities-when-the-depth-imbalance-is-further-from-0)
-    - [Trading opportunities on less-commonly observed area](#trading-opportunities-on-less-commonly-observed-area)
+    - [Trading opportunities on less-commonly observed values](#trading-opportunities-on-less-commonly-observed-values)
     - [Examples how removal of illiquid moments affect the visualization](#examples-how-removal-of-illiquid-moments-affect-the-visualization)
-    - [Effect Of Clipping](#effect-of-clipping)
   - [Future Direction](#future-direction)
 
 ## Summary
@@ -139,22 +138,29 @@ Let's take a look at some examples.
 ### More trading opportunities when the depth imbalance is closer to 0
 
 - with Deep Orders
+
 ![](images2/ask_price_500000_NK225_1_5000.png)
 
 - Sallower Orders Only
+
 ![](images2/ask_price_15000_TOPIX_1_500.png)
 
 ### More trading opportunities when the depth imbalance is further from 0
 - With Deep Order
+
 ![](images2/ask_price_500_JGBL_1_2000.png)
 - With Shallower Orders
+
 ![](images2/ask_price_500000_NK225_1_100.png)
 
 - Without Shallower Orders
+
 ![](images2/ask_price_500_JGBL_1_2000.png)
 
-### Trading opportunities on less-commonly observed area
-I discovered that there are examples where you get higher chance of trading opportunities 
+### Trading opportunities on less-commonly observed values
+I discovered that there are examples where you get higher chance of trading opportunities when variable takes a less-commonly observed value.
+
+I'm suspecting that this is an affect of some kind of outlier.
 
 ![](images2/bid_price_15000_TOPIX_1_500.png)
 
@@ -165,51 +171,10 @@ As I disucssed previously, data points where the orders aren't fill-able is remo
 Take a look at the images below.  
 There are many observations that couldn't fill an order of size 2000; As a result, latter plot has lots of data points removed from the visualization, yet it gets more buy/sell groups.
 
+This visualization is not good at helping 
+
 ![](images2/bid_price_15000_TOPIX_1_100.png)
 ![](images2/bid_price_15000_TOPIX_1_2000.png)
-
-
-
-### Effect Of Clipping
-I removed moments where order book didn't have enough orders to fill large orders.
-
-
-
-2. There are examples where market move to either direction on least liquid moment, however, I cannot conclude whether this is a product of extreme outlier or something else.
-3. 
-- 
-- Liquid Market vs Less Liquid Market
-  - Buy/Sell is more observed? than Timeout when the market is liquid.
-  - TOPIX Mini's order book didn't have enough orders to fill an order of size 5000 in a lot of cases, and it appears that TOPIX had more Buy/Sell when they were fill-able.
-
-- Deep vs Shalow
-  - `Q1, Q2 = 1, 5000` shows   `Q1, Q2 = 1, 100 ` 
-
-- NK225
-
-- TOPIX
-  - Buy/Sell group is more likely to be observed on a liquid environment i.e. when depth imbalance values are closer to 0. Following plot shows that, for bid prices, there is a surge of Sell group but I'm assuming this is only coming from extreme conditions.
-  
-![](images2/bid_price_15000_TOPIX_1_500.png)
-![](images2/ask_price_15000_TOPIX_1_500.png)
-
-  - This is more apparent when you plot out a deeper market as Timeout is literaly non-existent as any moment where size of 5000 cannot be filled is filtered.
-
-![](images2/ask_price_15000_TOPIX_1_5000.png)
-
-
-- NK225
-
-  - Order book lacked enough orders to catch large order; e.g. bid price never had enough orders to take market order of size 5000.
-  - When you look into deeper data (e.g. Q1, Q2 = 2000, 5000), Timeout group only appears on the most liquid moment; My guess is that this is related to the market depth.  
-  
-  
-
-
-NOTE: 
-- Market it more liquid (can take bigger order with less fluctuation) when the value is closer to 0.
-- Spread, on the other hand, tells you if ask/bid is more liquid than one another.
-
 
 
 ## Future Direction
