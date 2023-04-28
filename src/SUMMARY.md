@@ -10,7 +10,7 @@
 
 - [Research Question 3: Depth Imbalance](./depth-imbalance/result.md)
 
-- [Research Question 4: Predicting Market Move](./predicting-market-move/overview.md)
+- [Research Question 4: Predicting Market Move](./predicting-market-move/result.md)
 
 - [Future Direction](./future-direction/overview.md)
     - [Software Engineering And Cloud Computing](./future-direction/software-engineering-and-cloud-computing.md)

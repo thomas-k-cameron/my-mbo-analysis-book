@@ -13,6 +13,7 @@
   - [Future Direction](#future-direction)
 
 ## Summary
+- Market liquidity is measured by *what the average execution price of FOK market order would be at given tick of an orderbook*
 - Market tends to offer more trading opportunities when order book is more liquid
 - However, there are some details to it.
 
@@ -90,36 +91,36 @@ Take a look at the image below.
 
 
 - Plot above shows the ratio of buy, sell and timeout group.  
-  This is same as the one I talked about on the other chapter.  
-  Each data point is weighted by the duration of the tick.  
+This is same as the one I talked about on the other chapter.  
+Each data point is weighted by the duration of the tick.  
 
 - Plot below shows the number of observations.   
-  Each data point is weighted by the duration of state.  
+Each data point is weighted by the duration of state.  
 
 - There were many cases where order book didn't have enough orders to fill an order of size Q.   
-  These observations are filtered.
+These observations are filtered.
 
 
 ![](images2/bid_price_15000_TOPIX_100_500.png)
 
 Title of the plot shows the parameters.
-  In this case, it means,
-  - `Q1, Q2 = 100, 500`
-  - Future this plot visualize is `TOPIX`, 
-  - It uses orders found on `bid` side to plot out the value
-  - When the market moves for greater than or equal to `1.5000 points` in either direction within 3600 seconds, data point is marked as `Buy` or `Sell`. `Timeout`, if it doesn't move `1.5 points` in 3600 seconds.
+In this case, it means,
+- `Q1, Q2 = 100, 500`
+- Future this plot visualize is `TOPIX`, 
+- It uses orders found on `bid` side to plot out the value
+- When the market moves for greater than or equal to `1.5000 points` in either direction within 3600 seconds, data point is marked as `Buy` or `Sell`. `Timeout`, if it doesn't move `1.5 points` in 3600 seconds.
 
 From the plot, you can learn that;  
 - There are more trading opportunities when the depth imbalance is closer to 0, i.e. more liquid.
 - You can see that signal dominating the tail of the distribution; I think this comes from some kind of outlier since we only have small number of observations.
 
 Here is another example.
-  ![](images2/bid_price_50000_TOPIXM_1_1000.png)
+![](images2/bid_price_50000_TOPIXM_1_1000.png)
 Parameters are, 
-  - `Q1, Q2 = 1, 1000`
-  - Product is `TOPIX Mini`. (TOPIXM is the name meta data uses on ITCH message)
-  - It uses orders found on `ask` side to plot out the value
-  - When the market moves for greater than equal to `5.0` points in either direction within `3600 seconds`, data point is marked as `Buy` or `Sell`. Otherwise it's `Timeout`.
+- `Q1, Q2 = 1, 1000`
+- Product is `TOPIX Mini`. (TOPIXM is the name meta data uses on ITCH message)
+- It uses orders found on `ask` side to plot out the value
+- When the market moves for greater than equal to `5.0` points in either direction within `3600 seconds`, data point is marked as `Buy` or `Sell`. Otherwise it's `Timeout`.
 
 ## Results
 **Is the market more likely to move when the order book is liquid?**  
@@ -186,14 +187,14 @@ I believe this chapter reveals that there are lot to learn from order book's liq
 I can come up with few other ways that too further help improve the understanding of the market;
 
 - Summing quantity of all maker orders on order book  
-  I learned that order book doesn't have infinite 
+I learned that order book doesn't have infinite 
 
 - Cluster orders by different quantity and speed
-  Over 99% of maker order's size is less than `10`, and most of them are just `1`.  
-  However, there are some orders whose size is as big as 5000.
+Over 99% of maker order's size is less than `10`, and most of them are just `1`.  
+However, there are some orders whose size is as big as 5000.
 
-  Large order can have strong influence over the metric I used.  
-  There might be something that I can laern by filtering large orders.  
-  Also, I might be able to learn something by the behaviour of larger orders too.
+Large order can have strong influence over the metric I used.  
+There might be something that I can laern by filtering large orders.  
+Also, I might be able to learn something by the behaviour of larger orders too.
 
 Overall, I think liquidity is something you can look at to understand market movement.

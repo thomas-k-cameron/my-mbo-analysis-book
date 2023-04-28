@@ -1,9 +1,19 @@
 # Research Question 1: Speed and Execution Rate
+- [Research Question 1: Speed and Execution Rate](#research-question-1-speed-and-execution-rate)
+  - [Dataset](#dataset)
+  - [Overview](#overview)
+    - [Result1: Nikkei 225 and Nikkei 225 Mini Futures](#result1-nikkei-225-and-nikkei-225-mini-futures)
+    - [Result2: Future Only](#result2-future-only)
+    - [Result 3: Options Only](#result-3-options-only)
+    - [Result 5: Comparison of products at nearest expiry; JGBL/NK225 Mini/NK225/TOPIX/TOPIX Mini](#result-5-comparison-of-products-at-nearest-expiry-jgblnk225-minink225topixtopix-mini)
+  - [Future Direction](#future-direction)
+
+
 It is said that orders from HFTs are more likely to be deleted, instead of getting matched with another order. 
 
 Do faster orders get deleted more often?
 
-# Dataset
+## Dataset
 
 This chapter only uses the data from March 1st.
 You can find my dataset on kaggle.  
@@ -16,7 +26,7 @@ There is a notebook on kaggle which does something simliar to what I did on this
 Link: [notebook](https://www.kaggle.com/datasets/a53e93e57a1/maker-order-dataset-osaka-20210301)
 
 
-# Methodology
+## Overview
 Take a look at a scatter plot below.
 
 !["result1"](../image/../images/execution_rate/all_options.jpg)
@@ -70,7 +80,7 @@ Each color represents different variables;
 Orange and Red can only be observed when the order is modified.
 I added Green to see if it is the modification that is making the difference or not.
 
-## Result1: Nikkei 225 and Nikkei 225 Mini Futures
+### Result1: Nikkei 225 and Nikkei 225 Mini Futures
 Let's take a look at orders from NK225/NK225M.
 Nikkei futures are the most actively traded rroducts on Osaka Exchange.
 
@@ -79,14 +89,14 @@ Orange/Green shows higher execution rate but since Red is not as high as those t
 
 !["result2"](../images/execution_rate/plot_nk225_nk225m.jpg)
 
-## Result2: Future Only
+### Result2: Future Only
 
 Shape of the plot looks similar to Nikkei 225/Nikkei 225 Mini futures.  
 I believe that the reason that execution rate is lower across different speed is because the data includes a lot of low-volume products that are dominated by market makers.
 
 !["result3"](../images/execution_rate/all_future.jpg)
 
-## Result 3: Options Only
+### Result 3: Options Only
 This plot is same as the one shown on the start of this chapter.
 
 Execution rate of options are lower compare to futures, and I believe this is because it includes a lot of inactive contracts like deep ITM/OTM options.
@@ -104,7 +114,7 @@ It shows that there are more maker orders around ATM and contracts that experien
 
 !["result3"](../images/unique_id_count_vs_strike_price.png)
 
-## Result 5: Comparing products at nearest expiry; JGBL/NK225 Mini/NK225/TOPIX/TOPIX Mini
+### Result 5: Comparison of products at nearest expiry; JGBL/NK225 Mini/NK225/TOPIX/TOPIX Mini
 
 JGBL, NK225 Mini, NK225, TOPIX and TOPIX Mini is the most active products.
 Following plot is based on the aggregate of orders appeared during March 2021.  
