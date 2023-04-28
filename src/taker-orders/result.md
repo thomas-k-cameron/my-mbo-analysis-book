@@ -27,6 +27,7 @@ Below plot is the visualization of generated data.
 - Signal
 
   This is a categorical value that takes one of 3 value;
+
   | Value   | Condition                                                                                                                    |
   | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
   | Buy     | If you `buy` the contract at `ask price`, you can turn `X` point of profit by selling at `bid price` in next `3600 seconds`  |
@@ -37,6 +38,7 @@ Below plot is the visualization of generated data.
   This tracks taker's profit at maturity, it uses reference price as hypothetical final settlement price.
 
   Say, in last `T` seconds, we observed following transactions.
+
   | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
   | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
   | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
@@ -46,16 +48,21 @@ Below plot is the visualization of generated data.
 
 
   When the reference price is 20,000JPY, value at maturity would be, 
-  | Product     | -3% (19,400) | -2%(19,600) | -1%(19,800) | 0%(20,000) | 1%(20,200) | 2%(20,400) | 3%(20,600) |
-  | ----------- | ------------ | ----------- | ----------- | ---------- | ---------- | ---------- | ---------- |
-  | Future      | -5,000       | -3,000      | -1,000      | 1,000      | 3,000      | 5,000      | 7,000      |
-  | Mini Future | 700          | 500         | 300         | 100        | -100       | -300       | -500       |
-  | Call option | -5,000       | -5,000      | -5,000      | -5,000     | -3,000     | -1,000     | 1,000      |
-  | Put option  | -3,000       | -1,000      | 1,000       | 3,000      | 3,000      | 3,000      | 3,000      |
+
+  | Moneyness    | Future | Mini Future | Call option | Put option |
+  | ------------ | ------ | ----------- | ----------- | ---------- |
+  | -3% (19,400) | -5,000 | 700         | -5,000      | -3,000     |
+  | -2%(19,600)  | -3,000 | 500         | -5,000      | -1,000     |
+  | -1%(19,800)  | -1,000 | 300         | -5,000      | 1,000      |
+  | 0%(20,000)   | 1,000  | 100         | -5,000      | 3,000      |
+  | 1%(20,200)   | 3,000  | -100        | -3,000      | 3,000      |
+  | 2%(20,400)   | 5,000  | -300        | -1,000      | 3,000      |
+  | 3%(20,600)   | 7,000  | -500        | 1,000       | 3,000      |
 
 - Profit at Maturity Measured Against Reference Price *un-weigted* by volume
 
   Say, in last `T` seconds, we observed following transactions (same as the previous example).
+
   | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
   | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
   | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
@@ -65,12 +72,16 @@ Below plot is the visualization of generated data.
 
 
   When the reference price is 20,000JPY, value at maturity would be, 
-  | Product     | -3% (19,400) | -2%(19,600) | -1%(19,800) | 0%(20,000) | 1%(20,200) | 2%(20,400) | 3%(20,600) |
-  | ----------- | ------------ | ----------- | ----------- | ---------- | ---------- | ---------- | ---------- |
-  | Future      | -500         | -300        | -100        | 100        | 300        | 500        | 700        |
-  | Mini Future | 70           | 50          | 30          | 10         | -10        | -30        | -50        |
-  | Call option | -500         | -500        | -500        | -500       | -300       | -100       | 100        |
-  | Put option  | -300         | -100        | 100         | 300        | 300        | 300        | 300        |
+
+  | Moneyness    | Future | Mini Future | Call option | Put option |
+  | ------------ | ------ | ----------- | ----------- | ---------- |
+  | -3% (19,400) | -500   | 70          | -500        | -300       |
+  | -2%(19,600)  | -300   | 50          | -500        | -100       |
+  | -1%(19,800)  | -100   | 30          | -500        | 100        |
+  | 0%(20,000)   | 100    | 10          | -500        | 300        |
+  | 1%(20,200)   | 300    | -10         | -300        | 300        |
+  | 2%(20,400)   | 500    | -30         | -100        | 300        |
+  | 3%(20,600)   | 700    | -50         | 100         | 300        |
 
 - Aggregated volume
   
@@ -82,7 +93,8 @@ Below plot is the visualization of generated data.
 
 - Unrealized Profit  
 
-  Say, in last `T` seconds, we observed following transactions (same as the previous example).
+  Say, in last `T` seconds, we observed following transctions (same as the previous example).
+
   | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
   | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
   | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
@@ -92,6 +104,7 @@ Below plot is the visualization of generated data.
 
 
   Unrealized gains at given best bid/ask is;
+  
   | Product     | unrealized gains | best bid | best ask |
   | ----------- | ---------------- | -------- | -------- |
   | Future      | 11,000           | 21,000   | 21,100   |
@@ -102,6 +115,7 @@ Below plot is the visualization of generated data.
 - Unrealized Profit (Un-Weigted by Volume)  
 
   Say, in last `T` seconds, we observed following transactions (same as the previous example).
+
   | Product     | Taker's Side | Quantity | Strike Price | Transaction Price | Transaction Time |
   | ----------- | ------------ | -------- | ------------ | ----------------- | ---------------- |
   | Future      | Buy          | 10       | ---          | 19,900            | 10:00            |
@@ -111,6 +125,7 @@ Below plot is the visualization of generated data.
 
 
   Unrealized gains at given best bid/ask is;
+
   | Product     | unrealized gains | best bid | best ask |
   | ----------- | ---------------- | -------- | -------- |
   | Future      | 1,100            | 21,000   | 21,100   |
