@@ -2,8 +2,7 @@
 - [Overview](#overview)
   - [Research Question](#research-question)
   - [Dataset](#dataset)
-  - [Technical Infrastructure](#technical-infrastructure)
-  - [LOB Simluation Software](#lob-simluation-software)
+  - [Software and Technical Infrastructure](#software-and-technical-infrastructure)
   - [Kaggle Dataset](#kaggle-dataset)
 
 This is my personal research project about analyzing the market order-by-order using snapshot of ITCH message from Osaka Exchange.
@@ -41,14 +40,10 @@ This dataset allows you to analyze every maker orders that was visible on the or
   For my particular dataset, it contains the information necessary to rebuild the order book for every products available;
   This includes, options, futures and combination products(calendar spread).  
 
-## Technical Infrastructure  
+## Software and Technical Infrastructure
+- To work with 
+- Order book simluator 
   Data was stored on `AWS S3` and processed with spot instances of `AWS EC2` managed by `AWS Batch`.
-
-## LOB Simluation Software   
-  
-  Software for LOB reconstruction is based on the specification provided by JPX and it is developed from scratch.   
-  It is written in Rust.   
-  Callback based interface allows you to capture updates that happens on the order book.
 
   
 ## Kaggle Dataset  

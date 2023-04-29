@@ -1,9 +1,8 @@
 # Research Question 2: Taker Orders
 - [Research Question 2: Taker Orders](#research-question-2-taker-orders)
   - [Summary](#summary)
-  - [Graphical Overview of Generated Data](#graphical-overview-of-generated-data)
+  - [Visualized Overview of Generated Data](#visualized-overview-of-generated-data)
   - [Result](#result)
-  - [Dataset](#dataset)
   - [Visualization of Statistical Summary](#visualization-of-statistical-summary)
     - [Nikkei Future](#nikkei-future)
     - [TOPIX Future](#topix-future)
@@ -13,9 +12,10 @@
 
 - I measured taker orders by it's unrealized profit, volume and profitability of their position at maturity  
 - Products that I analyzed is Nikkei 225, TOPIX and Japanese Government Bond Future; For Nikkei 225 and TOPIX, mini variant is included.
-- Statistical summary reveals that, underlying distribution of variable changes before large market move in many cases.
+- I grouped each data points by how it's market moved in next 3600 seconds.
+- Statistical summary reveals that underlying distribution of data points are different prior to market move        
 
-## Graphical Overview of Generated Data
+## Visualized Overview of Generated Data
 Below plot is the visualization of generated data.
 
 ![plot](./summary.png)
@@ -134,6 +134,26 @@ Below plot is the visualization of generated data.
 
 ## Result
 I calculated the summary statistics of each variables after grouping each data points by it's signal.
+Data is normalized by,
+
+
+- converting each data point into percentile changes of it's previous data.
+
+  e.g.
+
+  |      |     after | original data |
+  | ---: | --------: | ------------: |
+  |    0 |       nan |            10 |
+  |    1 |       0.1 |            11 |
+  |    2 | -0.181818 |             9 |
+
+- removing outliers
+  
+  Any data point that is not between 1% ~ 99% percentile is filtered.
+  
+- removing data points that did not change
+  
+  There were many data point which did not change from the previous value. Any data point that is `0` is removed.
 
 To sum up, I can say the following for each variable;
 
@@ -156,30 +176,6 @@ From left we have skew, kurtosis, variance, mean, 1% percentile and 99% percenti
 
 The title tells you the parameter. For example, the first row says "NK225: window = 60 secs, signal_size = 50.0 JPY".
 This means, the plot uses Nikkei 225 future data, with window size of 60 seconds, and signal size of 50 JPY.
-
-## Dataset
-Data used here can be found here.
-
-Data is normalized by,
-
-- converting each data point into percentile changes of it's previous data.
-
-  e.g.
-
-  |      |     after | original data |
-  | ---: | --------: | ------------: |
-  |    0 |       nan |            10 |
-  |    1 |       0.1 |            11 |
-  |    2 | -0.181818 |             9 |
-
-- removing outliers
-  
-  Any data point that is not between 1% ~ 99% percentile is filtered.
-  
-- removing data points that did not change
-  
-  There were many data point which did not change from the previous value. Any data point that is `0` is removed.
-
 
 ## Visualization of Statistical Summary
 

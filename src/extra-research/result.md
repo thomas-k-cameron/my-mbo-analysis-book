@@ -24,9 +24,7 @@ Reference Quarter:  For a given contract, interval from (and including) 3rd Wed 
 ```
 
 Formula for measuring theoretical price for future contract is;
-(\(TheoreticalPrice = [100 - P] - [r (x/360)])\)
-Where 
-(\(P = R on the final settlement day\))
+\\((TheoreticalPrice = [100 - R] - [r (x/360)]\\))  
 
 ## Meeting Probabilities
 According to FedWatch tool on CME, probability of fed hikinng on 6/14/2023 meeting is just over 90%. No change is at 10%. 
@@ -53,14 +51,15 @@ So,
 - short future and covered puts, you can get the break even of 94.9250 + 0.12 = 95.045.
 
 So, you can create a position where you'd only lose money the final settlement price becomes,  
-| covered call     | covered put         |
-| ---------------- | ------------------- |
-| lower than 94.82 (5.25% or above) | greater than 95.045 (5% or lower)|
+
+| covered call                      | covered put                       |
+| --------------------------------- | --------------------------------- |
+| lower than 94.82 (5.25% or above) | greater than 95.045 (5% or lower) |
 
 It *feels* like both positions are solid.
 You can lose money when SOFR goes outside 5% ~ 5.25% range, but this is the most predicted range.
-
 Unless the fed is trying to surprise the market, we should be able to turn a profit or at least not-lose money.
+I would've opened a position with covered put if broker allowed me too.
 
 I think you can properly figure out if these positions are going to be profitable or not once you figure out the diviation between SOFR and fed target rate.
 
