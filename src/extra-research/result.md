@@ -65,11 +65,15 @@ I think you can properly figure out if these positions are going to be profitabl
 
 Also, you should've been able to have a better chance of success if you were able to trade this before the time decay took away the option's value.
 
+Another think comes up to my mind is a butterfly spread.
+
 ## Future Direction
 
 I think, with enough time, you can create a sophisticated model that allows you to make money off arbitrage trading.
 Things that I need to figure out is,
 - SOFR vs Fed Traget: How much do SOFR deviate from Fed Target?
+- Better model for calculating theoretical price of SOFR futures
+- 
 - What are the tail risks of trading SOFR?
 
 Since there are many products like Euro Dollars and T bills which collarates with rates, I think this is an interesting field to look into.
