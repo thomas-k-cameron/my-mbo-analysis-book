@@ -11,26 +11,22 @@ This is my personal research project about analyzing the market order-by-order u
 This dataset allows you to analyze every maker orders that was visible on the order book.
 
 ## Related Github Repositories
-- [Order Book](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)/
-  
-- [Code that I used for generating data with order book](https://github.com/thomas-k-cameron/jpx_mbo_features/)
-  
+- [Order Book Simulator for Osaka Exchange](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)
+- [Data Generation with the Order Book Simulator](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)
   
 ## Research Question  
   1. Is it true that high-speed orders are more likely to get canceled?  
     
       Yes, this is true.   
-      *Slower* orders is more likely to be executed, though there are some context to it.
+      *Slower* orders is more likely to be executed.
 
-  2. It is said that taker orders are driving force in the market, can they predict the market move?    
+  2. It is said that taker orders are driving force in the market; Is it true?  
       
-      I measured the taker's position in several different ways, and created a statistical summary.  
-      Statistical summary shows that most variables shows different statiscial property before large market move.
+      Statistical summary shows that distributions are different when trading opportunity arises.
 
   3. Do market liquidity provide any information on market movement?   
       
-      Yes, it seems like it.  
-      But it's complicated.
+      There are more trading opportunities when market is more liquid.  
       
   4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
 
@@ -42,15 +38,14 @@ This dataset allows you to analyze every maker orders that was visible on the or
 ## Dataset  
   Dataset is the snapshot of ITCH protocol message distributed on March 2021 at Osaka Exchange.   
   ITCH is a message format widely adopted by financial exchanges and it is tailored for distributing information to market participants.  
-  Size of the data exceeds 200GB.  
+  
+  Dataset consist of over 45 billion records and size of the data exceeds 200GB.  
 
   For my particular dataset, it contains the information necessary to rebuild the order book for every products available;
   This includes, options, futures and combination products(calendar spread).  
 
 ## Software and Technical Infrastructure
-- To work with 
-- Order book simluator 
-  Data was stored on `AWS S3` and processed with spot instances of `AWS EC2` managed by `AWS Batch`.
+Data is processed on AWS using `EC2 Spot Instance` and `Fargate Spot Instance` scheduled by `AWS Batch`.
 
   
 ## Kaggle Dataset  
