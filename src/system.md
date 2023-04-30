@@ -1,22 +1,22 @@
 # Overview of System/Tools/Software
 - [Overview of System/Tools/Software](#overview-of-systemtoolssoftware)
-  - [Current Implementation](#current-implementation)
-    - [Order Book Simulator](#order-book-simulator)
-    - [Cloud Environment](#cloud-environment)
+  - [Order Book Simulator](#order-book-simulator)
+  - [Cloud Environment](#cloud-environment)
   - [Future Direction](#future-direction)
     - [Order Book](#order-book)
     - [Automate things](#automate-things)
 
-
-
-## Current Implementation
-
-### Order Book Simulator
+## Order Book Simulator
 
 Order book simluator is built from scratch with Rust based on specification provided by Japan Exchange Group.  
 It works with Osaka Exchange's ITCH procotol message.
 
-### Cloud Environment
+Current implementation requires all data to be loaded onto the RAM.
+The original dataset was not sorted by timestamp and I didn't want to mess around with the data as I was concerned that I might break it without noticing it.
+
+List of things that I can improve is mentioned on future direction.
+
+## Cloud Environment
 I used AWS, but I believe same can be done in other platform as well.
 
 Here are my reasoning for using S3 over other services.
@@ -59,9 +59,6 @@ I almost exclusively used EC2 but this is what I found out about AWS's computing
 
 ## Future Direction
 ### Order Book
-Current implementation requires all data to be loaded onto the RAM.
-The original dataset was not sorted by timestamp and I didn't want to mess around with the data as I was concerned that I might break it without noticing it.
-
 Things that I would do to improve:
 
 - Multi-threading

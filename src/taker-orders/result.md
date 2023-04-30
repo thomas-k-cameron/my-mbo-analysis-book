@@ -1,5 +1,5 @@
-# Research Question 2: Taker Orders
-- [Research Question 2: Taker Orders](#research-question-2-taker-orders)
+# Research Question 3: Taker Orders
+- [Research Question 3: Taker Orders](#research-question-3-taker-orders)
   - [Summary](#summary)
   - [Visualized Overview of Generated Data](#visualized-overview-of-generated-data)
   - [Result](#result)

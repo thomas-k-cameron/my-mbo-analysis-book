@@ -86,22 +86,33 @@ So, our depth imbalance is -50/50 at this given moment, and depth imbalance spre
 On the plot that I shown to you, I use the absolute value of ask to make it look prettier.
 
 ### Aggregating Depth Imbalance
-Visualizing whole month of time series data would require a large monitor and most people doesn't have that. 
+Visualizing whole month of time series data would require a large monitor and my monitor isn't big enough.  
+We are going to aggregate the values.
+
 Take a look at the image below.
 
+![](images2/bid_price_15000_TOPIX_100_500.png)
 
-- Plot above shows the ratio of buy, sell and timeout group.  
-This is same as the one I talked about on the other chapter.  
-Each data point is weighted by the duration of the tick.  
+- Plot above shows the ratio of data points which offers  
+Each data point is assigned a categorical value `signal` which takes one of three value; `Buy`, `Sell` or `Timeout`
+
+| Value   | Condition                                                                                                                    |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Buy     | If you `buy` the contract at `ask price`, you can turn `X` point of profit by selling at `bid price` in next `3600 seconds`  |
+| Sell    | If you `sell` the contract at `bid price`, you can turn `X` point of profit by selling at `ask price` in next `3600 seconds` |
+| Timeout | None of the condition were met.                                                                                              |
+
+Buy, Sell and Timeout is same as the `signal` variable discussed on `Research Question 3: Taker Orders`.
 
 - Plot below shows the number of observations.   
 Each data point is weighted by the duration of state.  
 
-- There were many cases where order book didn't have enough orders to fill an order of size Q.   
-These observations are filtered.
+- Filtered data points  
+There were many cases where order book didn't have enough orders to fill an order of size Q. These observations are filtered.
 
 
-![](images2/bid_price_15000_TOPIX_100_500.png)
+
+
 
 Title of the plot shows the parameters.
 In this case, it means,
