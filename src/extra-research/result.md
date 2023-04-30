@@ -56,7 +56,7 @@ So, you can create a position where you'd only lose money the final settlement p
 | --------------------------------- | --------------------------------- |
 | lower than 94.82 (5.25% or above) | greater than 95.045 (5% or lower) |
 
-It *feels* like both positions offer solid trading opportunities.  
+It *feels* like both positions offer fair amount of chance to turn a profit.  
 You can lose money when SOFR goes outside 5% ~ 5.25% range, but this is the most predicted range.  
 Unless the fed is trying to surprise the market, we should be able to turn a profit or at least not-lose money.  
 I would've opened a position with covered put if broker allowed me too.  
