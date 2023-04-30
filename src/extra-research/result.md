@@ -1,4 +1,4 @@
-# Extra Research: long 30 days federal fund rate with covered call
+# Fun Quiz: long 30 days federal fund rate with covered call
 The research question is unrelated to rest of the questions.  
 This is more of a fun brain teaser than a research project.
 

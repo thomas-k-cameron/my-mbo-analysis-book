@@ -10,9 +10,9 @@
 
 ## Summary
 
-- I measured taker orders by it's unrealized profit, volume and profitability of their position at maturity  
-- Products that I analyzed is Nikkei 225, TOPIX and Japanese Government Bond Future; For Nikkei 225 and TOPIX, mini variant is included.
-- I grouped each data points by how it's market moved in next 3600 seconds.
+- I measured taker orders' activity by it'S aggregated unrealized profit, volume and profitability of their position at maturity on each tick 
+- Products that I analyzed are Nikkei 225, TOPIX and Japanese Government Bond Future; For Nikkei 225 and TOPIX, mini variant included with appropriate weight.
+- I grouped each data points by how the market moved in next 3600 seconds.
 - Statistical summary reveals that underlying distribution of data points are different prior to market move        
 
 ## Visualized Overview of Generated Data
@@ -25,7 +25,7 @@ Below plot is the visualization of generated data.
 
 - Signal
 
-  This is a categorical value that takes one of 3 value;
+  This is a categorical value that takes one of 3 value.
 
   | Value   | Condition                                                                                                                    |
   | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -164,12 +164,13 @@ To sum up, I can say the following for each variable;
   - Some Timeout groups have larger/smaller value  
 - Product Difference
   - NK225  
-    - Compared to other products, Buy/Sell and Timeout has less overlap. It can be said that this is coming from it's Japan's most active options market.
+    Compared to other products, Buy/Sell and Timeout has less overlap.   
+    It can be said that this is coming from it's Japan's most active options market.
   - JGBL  
-    - Overlap between Timeout group and others are more significant on JGBL, I'm suspecting that this is due to the smaller number of taker orders and volume 
-  - TOPIX 
-    - TOPIX's variable looks less scattered, this is coming from the lack of activity in it's options space.
-    - Option related variables are removed.
+    Overlap between Timeout group and others are more significant on JGBL, I'm suspecting that this is due to the smaller number of taker orders.  
+  - TOPIX   
+    TOPIX's variable looks less scattered, this is coming from the lack of activity in it's options space.  
+    Option related variables are removed.
 
 Here is a plot that shows the aggregate of statistical summary of the data for each product.  
 From left we have skew, kurtosis, variance, mean, 1% percentile and 99% percentile of the data.

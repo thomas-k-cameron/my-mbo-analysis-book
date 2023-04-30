@@ -22,19 +22,19 @@ I used AWS, but I believe same can be done in other platform as well.
 Here are my reasoning for using S3 over other services.
 
 - Data Storage: Object Storage vs MySQL/PostgresDB vs Serverless databases     
-  - Object Storage
+  - Object Storage  
     Least expensive and as long as you keep the file size small, it work.   
     Schema is not required, so it's not difficult to introduce new data types.
 
-  - Server RDBMS (e.g. MySQL, PostgresDB)  
+  - Server RDBMS (e.g. MySQL, PostgresDB)   
     Server is quite expensive and query wasn't always as fast.  
     Since most my dataset was read only so most features were not necessary.  
 
-  - Serverless DB
+  - Serverless DB  
     You will only be charged for what you use but you could mess up your query and end up with 1000 USD an hour. (it happened to me.)
     Since most my dataset was read only so most features were not necessary.  
 
-I almost exclusively used EC2 but this is what I found out about the hardware.
+I almost exclusively used EC2 but this is what I found out about AWS's computing services.
 
 - Computing: EC2 vs Lambda vs Fargate  
   - EC2
@@ -44,15 +44,15 @@ I almost exclusively used EC2 but this is what I found out about the hardware.
     - Wide range of configuration to choose from
     - Good discount with spot instances
   - Fargate
-    - Un-predictable hardware
+    - Un-predictable hardware  
       You don't know what CPU you are getting  
-    - Less configuration is required for Fargate
-  
+    - Less configuration is required for Fargate  
       AWS batch is quite tricky with EC2 but this is not the case with Fargate.
 
     - Slightly more expensive compared to EC2
   - Lambda
-    - Job must be completed in 15 Minutes or less  
+    - Works very well if you can divide up your jobs into smaller pieces
+    - Job must be completed in 15 Minutes
     - No spot instance
     - Hardware configuration is not flexible 
     - You can use it with S3 batch operation
