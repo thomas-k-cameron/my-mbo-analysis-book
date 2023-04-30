@@ -3,7 +3,7 @@ The research question is unrelated to rest of the questions.
 This is more of a fun brain teaser than a research project.
 
 So, the Russian commedians pranked J Powell.  
-It turns out that he is planning for 2 rate hikes which is what market is pricing in.
+It turns out that he is planning for 2 rate hikes and he mentioned that it matches with what the market is pricing in.
 
 Let's see if you can make money out of this.
 
@@ -12,7 +12,7 @@ Three-Month SOFR is a future contract that tracks the interest rate.
 Details can be found on [CME's website.](https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.contractSpecs.html)
 
 While SOFR is not the fed rate itself, it collarates with it.
-Importantly, unlike 30 days fed fund rate future, it has an active options market.
+Importantly, it has active options marke unlike 30 days fed fund rate future.
 
 According to the website, the price quotation is,
 ```
@@ -56,10 +56,10 @@ So, you can create a position where you'd only lose money the final settlement p
 | --------------------------------- | --------------------------------- |
 | lower than 94.82 (5.25% or above) | greater than 95.045 (5% or lower) |
 
-It *feels* like both positions are solid.
-You can lose money when SOFR goes outside 5% ~ 5.25% range, but this is the most predicted range.
-Unless the fed is trying to surprise the market, we should be able to turn a profit or at least not-lose money.
-I would've opened a position with covered put if broker allowed me too.
+It *feels* like both positions offer solid trading opportunities.  
+You can lose money when SOFR goes outside 5% ~ 5.25% range, but this is the most predicted range.  
+Unless the fed is trying to surprise the market, we should be able to turn a profit or at least not-lose money.  
+I would've opened a position with covered put if broker allowed me too.  
 
 I think you can properly figure out if these positions are going to be profitable or not once you figure out the diviation between SOFR and fed target rate.
 
@@ -73,8 +73,8 @@ I think, with enough time, you can create a sophisticated model that allows you 
 Things that I need to figure out is,
 - SOFR vs Fed Traget: How much do SOFR deviate from Fed Target?
 - Better model for calculating theoretical price of SOFR futures
-- 
-- What are the tail risks of trading SOFR?
+- Model how option price evolves over time
+- Find out what the tail risks are
 
 Since there are many products like Euro Dollars and T bills which collarates with rates, I think this is an interesting field to look into.
 
