@@ -13,7 +13,7 @@
 
 ### Order Book Simulator
 
-Order book simluator is built from scratch with Rust.  
+Order book simluator is built from scratch with Rust based on specification provided by Japan Exchange Group.  
 It works with Osaka Exchange's ITCH procotol message.
 
 ### Cloud Environment

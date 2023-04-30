@@ -1,8 +1,7 @@
 # Overview
 - [Overview](#overview)
-  - [Research Question](#research-question)
+  - [Research Questions](#research-questions)
   - [Dataset](#dataset)
-  - [Software and Technical Infrastructure](#software-and-technical-infrastructure)
   - [Kaggle Dataset](#kaggle-dataset)
 
 This is my personal research project about analyzing the market order-by-order using snapshot of ITCH message from Osaka Exchange.
@@ -11,7 +10,7 @@ Take a look
 
 This dataset allows you to analyze every maker orders that was visible on the order book.
 
-## Research Question  
+## Research Questions  
   1. Is it true that high-speed orders are more likely to get canceled?  
     
       Yes, this is true.   
@@ -42,10 +41,6 @@ This dataset allows you to analyze every maker orders that was visible on the or
   For my particular dataset, it contains the information necessary to rebuild the order book for every products available;
   This includes, options, futures and combination products(calendar spread).  
 
-## Software and Technical Infrastructure
-- To work with 
-- Order book simluator 
-  Data was stored on `AWS S3` and processed with spot instances of `AWS EC2` managed by `AWS Batch`.
 
 ## Kaggle Dataset  
   As part of my senior thesis, I made some of the dataset I'm using for this project partially available online.

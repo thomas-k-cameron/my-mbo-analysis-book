@@ -1,5 +1,6 @@
 # Overview
 - [Overview](#overview)
+  - [Related Github Repositories](#related-github-repositories)
   - [Research Question](#research-question)
   - [Dataset](#dataset)
   - [Software and Technical Infrastructure](#software-and-technical-infrastructure)
@@ -9,6 +10,12 @@ This is my personal research project about analyzing the market order-by-order u
 
 This dataset allows you to analyze every maker orders that was visible on the order book.
 
+## Related Github Repositories
+- [Order Book](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)/
+  
+- [Code that I used for generating data with order book](https://github.com/thomas-k-cameron/jpx_mbo_features/)
+  
+  
 ## Research Question  
   1. Is it true that high-speed orders are more likely to get canceled?  
     
