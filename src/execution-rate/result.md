@@ -37,15 +37,15 @@ To visualize how the likeliness of an order changes under different cirumstances
 
 *I'm going to call the probability of order to be `fully_executed` as `Execution Rate`*
 
-Each data point is;
+Each data point represents,
 
-\\[ P(X,A) = n(A_n)/n(S(X)_n) \\]
+\\[ P(X,A) = n(A_n)/n(S(X)) \\]
 
 Where,  
-- \\(S(X)_n\\)= Every order whose value of variable \\(X\\)is between n and n+1 percentile of \\(X\\)
-- \\(A_n\\)= Number of executed orders within \\(S_n\\)
-- \\(n(S_n)\\)= Number of observations in \\(S_n\\)
-- \\(n(A_n)\\)= Number of observations in \\(A_n\\)
+- \\(S(X)_n\\) = Observations whose's value is in \\(\(n, n+1]\\) percentile.
+- \\(A(X)_n\\) = Number of executed orders within \\(S(X)_n\\)
+- \\(n(S_n)\\) = Number of observations in \\(S_n\\)
+- \\(n(A_n)\\) = Number of observations in \\(A_n\\)
 - \\(1 \leq n \lt 100\\)
 
 I have considered some alterantives;
@@ -57,27 +57,27 @@ I have considered some alterantives;
 Each color represents different variables;  
 
 - Blue   
-  Blue is based on the amount of time the order stayed on the order book.  
+  Blue is based on how long order stayed on the order book.  
   It only includes orders that is deleted or fully matched.
   
-  For example, if an order that is deleted or fully matched on 10:30 was inserted on 10:00, then the value for blue is 1.8e+12 nanoseconds on 10:30.
+  For example, if an order that is deleted or fully matched on 10:30 was inserted on 10:00, then the value for blue is 1.8e+12 nanoseconds or 30 minutes.
 
 - Red  
   This is same as blue except that it include orders that was modified at least once.
 
-- Orange  
+- Yellow  
 
-  Orange is based on the longest time between order.
+  Yellow is based on the longest time between order events.
 
   For example, if the order was inserted on 10:00, modified on 10:01, 10:05, then this value is 4 minutes (or 2.4e+11 nano seconds), because between 10:01 and 10:05 is longest wait time.
   
 - Green  
   
-  Orange is based on the longest time between each order modification/creation.
+  Yellow is based on the longest time between each order events.
 
-  For example, if the order was inserted on 10:00, modified on 10:01, 10:05, then this value is 1 minutes (or 6e+10 nano seconds), because between 10:00 and 10:01 is the shortest.
+  For example, if the order was inserted on 10:00, modified on 10:01, 10:05, then this value is 1 minutes (or 6e+10 nano seconds).
 
-Orange and Red can only be observed when the order is modified.
+Yellow and Red can only be observed when the order is modified.
 I added Green to see if it is the modification that is making the difference or not.
 
 ### Result1: Nikkei 225 and Nikkei 225 Mini Futures
@@ -85,7 +85,7 @@ Let's take a look at orders from NK225/NK225M.
 Nikkei futures are the most actively traded rroducts on Osaka Exchange.
 
 Execution rate is noticably higher for slower orders.
-Orange/Green shows higher execution rate but since Red is not as high as those two variables, I belive that this indicates that number of times it was modified is not the reason behind the higher execution rate.
+Yellow/Green shows higher execution rate but since Red is not as high as those two variables, I belive that this indicates that number of times it was modified is not the reason behind the higher execution rate.
 
 !["result2"](../images/execution_rate/plot_nk225_nk225m.jpg)
 
@@ -104,7 +104,7 @@ Most active contracts are the ones around ATM.
 
 Slower/faster orders shows a higher execution rate just like other orders, but execution rate of slower orders are lower compared to futures.
 
-Additionally, we see a slight increase in execution rate for orange around 10^9 ~ 10^10 nano seconds.
+Additionally, we see a slight increase in execution rate for Yellow around 10^9 ~ 10^10 nano seconds.
 
 !["result4"](../images/execution_rate/all_options.jpg)
 
@@ -122,11 +122,11 @@ Following plot is based on the aggregate of orders appeared during March 2021.
 JGBL has a mini variant but I decided to exclude it since daily volume is very small.
 
 Every product shows similar pattern;  
-- Execution rate is higher when the order is slower \(> 10^10\) 
-- Execution rate of blue/red is lower than green/orange for slower orders \(> 10^10\) while this is not true when the speed is between 10^8 and 10^10.
+- Execution rate is higher when the order is slower. (Especially \(> 10^10\) )
+- Execution rate of blue/red is lower than green/yellow for slower orders \(> 10^10\) while this is not true when the speed is between 10^8 and 10^10.
 
-However, difference between blue/red and green/orange is different depending on the product.
-For example, execution rate of orders around 10^12, red/blue is less than half of green/orange for NK225, but it is somewhere around the two third on JGBL.
+However, difference between blue/red and green/Yellow is different depending on the product.
+For example, execution rate of orders around 10^12, red/blue is less than half of green/Yellow for NK225, but it is somewhere around the two third on JGBL.
 
 I think this difference might be coming from those trading these products;
 
