@@ -12,8 +12,8 @@ This dataset allows you to analyze every maker orders that was visible on the or
 
 ## Related Github Repositories
 - [Order Book Simulator for Osaka Exchange](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)
-- [Data Generation with the Order Book Simulator](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)
-  
+- [Data Generation with the Order Book Simulator](https://github.com/thomas-k-cameron/jpx_mbo_features)
+
 ## Research Question  
   1. Is it true that high-speed orders are more likely to get canceled?  
     
