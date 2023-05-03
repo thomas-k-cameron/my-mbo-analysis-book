@@ -194,11 +194,19 @@ This visualization is not good at helping
 I think liquidity is something you can look at to understand market movement, and here are some list of things that I think that I can use to figure out.
 Here are some list of things that I 
 
+- Normalization    
+  I used absolute difference between market depth; This would works with different market structure.   
+  This wouldn't work on longer time scale and it made it rather difficult to compare it against one another.
+
+  I need to normalize it.
+
 - Calculate confidence interval to figure out how many observations you need to use this data for predicting market move
-- Do total number of orders/contracts available on order book affect the market in anyway?
+
+- Do total number of orders/contracts available on order book affect the market in anyway?  
   We learned that order book may not have enough orders to satisfy large orders at given point in time.  
   I simply filtered these observations for this project but there should be something you can learn about it.
-- Clustering orders by different quantity/speed or other factors
+
+- Clustering orders by different quantity/speed or other factors  
   Over 99% of maker order's size is less than `10`, and most of them are just `1`.  
   However, there are some orders whose size is as big as 5000.
 
