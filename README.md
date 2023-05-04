@@ -1,5 +1,6 @@
 # MDBook
 This REPO is available as MDbook. Please check it out here.
+
 [https://thomas-k-cameron.github.io/my-mbo-analysis-book/](https://thomas-k-cameron.github.io/my-mbo-analysis-book/)
 
 # Overview
@@ -25,16 +26,16 @@ This dataset allows you to analyze every maker orders that was visible on the or
       Yes, this is true.   
       *Slower* orders is more likely to be executed.
 
-  3. Do market liquidity provide any information on market movement?   
+  2. Do market liquidity provide any information on market movement?   
       
       There are more trading opportunities when market is more liquid.  
 
-  2. It is said that taker orders are driving force in the market; Is it true?  
+  3. It is said that taker orders are driving force in the market; Is it true?  
       
       Statistical summary shows that distributions are different when there is a trading opportunity. (i.e. before large market move)
 
       
-  3. Can you predict the market movement using publicly available machine learning model with the data generated above?  
+  4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
 
        No, I couldn't make it work.  
        I tried it by using machine learning model that worked well for financial market competition on kaggle.
