@@ -3,6 +3,7 @@ This REPO is available as MDbook. Please check it out here.
 [https://thomas-k-cameron.github.io/my-mbo-analysis-book/](https://thomas-k-cameron.github.io/my-mbo-analysis-book/)
 
 # Overview
+- [MDBook](#mdbook)
 - [Overview](#overview)
   - [Related Github Repositories](#related-github-repositories)
   - [Research Question](#research-question)
@@ -16,23 +17,24 @@ This dataset allows you to analyze every maker orders that was visible on the or
 
 ## Related Github Repositories
 - [Order Book Simulator for Osaka Exchange](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)
-- [Data Generation with the Order Book Simulator](https://github.com/thomas-k-cameron/jpx_mbo_features)
-
+- [Data Generation with the Order Book Simulator](https://github.com/thomas-k-cameron/jpx_mbo_orderbook)
+  
 ## Research Question  
   1. Is it true that high-speed orders are more likely to get canceled?  
     
       Yes, this is true.   
       *Slower* orders is more likely to be executed.
 
-  2. It is said that taker orders are driving force in the market; Is it true?  
-      
-      Statistical summary shows that distributions are different when trading opportunity arises.
-
   3. Do market liquidity provide any information on market movement?   
       
       There are more trading opportunities when market is more liquid.  
+
+  2. It is said that taker orders are driving force in the market; Is it true?  
       
-  4. Can you predict the market movement using publicly available machine learning model with the data generated above?  
+      Statistical summary shows that distributions are different when there is a trading opportunity. (i.e. before large market move)
+
+      
+  3. Can you predict the market movement using publicly available machine learning model with the data generated above?  
 
        No, I couldn't make it work.  
        I tried it by using machine learning model that worked well for financial market competition on kaggle.
